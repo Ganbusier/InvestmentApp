@@ -88,7 +88,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ],
         ),
-        actions: [],
+        actions: const [],
       ),
       body: IndexedStack(
         index: _currentIndex,

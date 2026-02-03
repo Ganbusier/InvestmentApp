@@ -529,8 +529,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCategoriesSection(
       BuildContext context, PortfolioProvider provider) {
-    final percentages = provider.categoryPercentages;
-
     final categoryCards = <Widget>[];
     for (final category in PortfolioCategory.values) {
       categoryCards.add(
