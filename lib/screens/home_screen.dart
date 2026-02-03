@@ -337,7 +337,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: InkWell(
                     onTap: provider.needsRebalancing
-                        ? () => _showRebalanceSheet(context)
+                        ? () {
+                            final provider = Provider.of<PortfolioProvider>(context, listen: false);
+                            provider.selectTab(3);
+                          }
                         : null,
                     borderRadius: BorderRadius.circular(14),
                     splashColor: Colors.transparent,
@@ -851,7 +854,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       side: BorderSide(color: Colors.white.withValues(alpha: 0.2), width: 1),
                     ),
                     child: Text(
-                      '取消',
+                      '关闭',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w600,
@@ -859,60 +862,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                if (actions.isNotEmpty)
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        provider.recordRebalance();
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Row(
-                              children: [
-                                Icon(Icons.check_circle, color: Colors.white, size: 20),
-                                SizedBox(width: 10),
-                                Text('已执行再平衡'),
-                              ],
-                            ),
-                            backgroundColor: AppTheme.success,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(14),
-                      splashColor: Colors.transparent,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [AppTheme.accentGold, Color(0xFFE8C560)],
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.accentGold.withValues(alpha: 0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Text(
-                            '执行再平衡',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.primaryDark,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ],

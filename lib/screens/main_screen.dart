@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:investment_app/providers/portfolio_provider.dart';
 import 'package:investment_app/screens/fund_list_screen.dart';
 import 'package:investment_app/screens/home_screen.dart';
 import 'package:investment_app/screens/rebalance_screen.dart';
 import 'package:investment_app/screens/statistics_screen.dart';
 import 'package:investment_app/theme/app_theme.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,6 +32,8 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   void _onTabSelected(int index) {
+    final provider = Provider.of<PortfolioProvider>(context, listen: false);
+    provider.clearSelectedTab();
     if (mounted) {
       setState(() {
         _currentIndex = index;
@@ -39,6 +43,24 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<PortfolioProvider>(
+      builder: (context, provider, child) {
+        if (provider.selectedTabIndex != null && provider.selectedTabIndex != _currentIndex) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                _currentIndex = provider.selectedTabIndex!;
+              });
+              provider.clearSelectedTab();
+            }
+          });
+        }
+        return _buildBody();
+      },
+    );
+  }
+
+  Widget _buildBody() {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(

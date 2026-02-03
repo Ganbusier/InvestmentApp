@@ -11,6 +11,7 @@ class PortfolioProvider with ChangeNotifier {
   PortfolioCalculator? _calculator;
   RebalanceCalculator? _rebalanceCalculator;
   RebalanceSnapshot? _rebalanceSnapshot;
+  int? _selectedTabIndex;
 
   PortfolioProvider() {
     loadPortfolio();
@@ -20,6 +21,7 @@ class PortfolioProvider with ChangeNotifier {
   PortfolioCalculator? get calculator => _calculator;
   RebalanceCalculator? get rebalanceCalculator => _rebalanceCalculator;
   RebalanceSnapshot? get rebalanceSnapshot => _rebalanceSnapshot;
+  int? get selectedTabIndex => _selectedTabIndex;
 
   bool get isLoaded => _portfolio != null;
   bool get hasWarnings => _calculator?.hasAnyWarning ?? false;
@@ -211,6 +213,16 @@ class PortfolioProvider with ChangeNotifier {
 
   Future<void> loadRebalanceSnapshot() async {
     _rebalanceSnapshot = HiveService.getRebalanceSnapshot();
+    notifyListeners();
+  }
+
+  void selectTab(int index) {
+    _selectedTabIndex = index;
+    notifyListeners();
+  }
+
+  void clearSelectedTab() {
+    _selectedTabIndex = null;
     notifyListeners();
   }
 }
