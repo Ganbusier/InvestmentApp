@@ -17,33 +17,43 @@ class FundListScreen extends StatefulWidget {
 class _FundListScreenState extends State<FundListScreen> {
   bool _isEditMode = false;
   final Set<String> _selectedFundIds = {};
+  bool _isAllSelected = false;
 
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
       if (!_isEditMode) {
         _selectedFundIds.clear();
+        _isAllSelected = false;
       }
     });
   }
 
   void _toggleFundSelection(String fundId) {
+    final provider = Provider.of<PortfolioProvider>(context, listen: false);
+    final funds = provider.getAllFunds();
+    
     setState(() {
       if (_selectedFundIds.contains(fundId)) {
         _selectedFundIds.remove(fundId);
       } else {
         _selectedFundIds.add(fundId);
       }
+      _isAllSelected = _selectedFundIds.isNotEmpty && _selectedFundIds.length == funds.length;
     });
   }
 
   void _selectAll(List<Fund> funds) {
-    if (_selectedFundIds.length == funds.length) {
-      _selectedFundIds.clear();
-    } else {
-      _selectedFundIds.clear();
-      _selectedFundIds.addAll(funds.map((f) => f.id));
-    }
+    setState(() {
+      if (_isAllSelected) {
+        _selectedFundIds.clear();
+        _isAllSelected = false;
+      } else {
+        _selectedFundIds.clear();
+        _selectedFundIds.addAll(funds.map((f) => f.id));
+        _isAllSelected = true;
+      }
+    });
   }
 
   void _batchDelete(BuildContext context, PortfolioProvider provider) {
@@ -326,52 +336,52 @@ class _FundListScreenState extends State<FundListScreen> {
                       width: 1,
                     ),
                   ),
-                   child: Row(
-                    children: [
-                      InkWell(
-                        onTap: () => _selectAll(funds),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: _selectedFundIds.length == funds.length
-                                ? AppTheme.accentGold
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: _selectedFundIds.length == funds.length
+                    child: Row(
+                      children: [
+                        InkWell(
+                          onTap: () => _selectAll(funds),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _isAllSelected
                                   ? AppTheme.accentGold
-                                  : Colors.white.withValues(alpha: 0.2),
-                              width: 1.5,
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _isAllSelected
+                                    ? AppTheme.accentGold
+                                    : Colors.white.withValues(alpha: 0.2),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _isAllSelected
+                                      ? Icons.check_circle
+                                      : Icons.radio_button_unchecked,
+                                  color: _isAllSelected
+                                      ? AppTheme.primaryDark
+                                      : Colors.white.withValues(alpha: 0.5),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _isAllSelected ? '取消全选' : '全选',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: _isAllSelected
+                                        ? AppTheme.primaryDark
+                                        : Colors.white.withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                _selectedFundIds.length == funds.length
-                                    ? Icons.check_circle
-                                    : Icons.radio_button_unchecked,
-                                color: _selectedFundIds.length == funds.length
-                                    ? AppTheme.primaryDark
-                                    : Colors.white.withValues(alpha: 0.5),
-                                size: 18,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                _selectedFundIds.length == funds.length ? '取消全选' : '全选',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: _selectedFundIds.length == funds.length
-                                      ? AppTheme.primaryDark
-                                      : Colors.white.withValues(alpha: 0.7),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
-                      ),
                       const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
