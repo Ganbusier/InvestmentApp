@@ -1,25 +1,31 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/models/portfolio.dart';
+import 'package:investment_app/models/rebalance_snapshot.dart';
 
 class HiveService {
   static const String _fundsBoxName = 'funds';
   static const String _portfolioBoxName = 'portfolio';
   static const String _settingsBoxName = 'settings';
+  static const String _snapshotBoxName = 'rebalance_snapshot';
 
   static Box<Fund> get fundsBox => Hive.box<Fund>(_fundsBoxName);
   static Box<Portfolio> get portfolioBox => Hive.box<Portfolio>(_portfolioBoxName);
   static Box<dynamic> get settingsBox => Hive.box<dynamic>(_settingsBoxName);
+  static Box<RebalanceSnapshot> get snapshotBox => Hive.box<RebalanceSnapshot>(_snapshotBoxName);
 
   static Future<void> init() async {
     await Hive.initFlutter();
     Hive.registerAdapter(FundAdapter());
     Hive.registerAdapter(PortfolioAdapter());
     Hive.registerAdapter(PortfolioCategoryAdapter());
+    Hive.registerAdapter(RebalanceSnapshotAdapter());
+    Hive.registerAdapter(FundSnapshotAdapter());
     
     await Hive.openBox<Fund>(_fundsBoxName);
     await Hive.openBox<Portfolio>(_portfolioBoxName);
     await Hive.openBox<dynamic>(_settingsBoxName);
+    await Hive.openBox<RebalanceSnapshot>(_snapshotBoxName);
   }
 
   static Future<void> addFund(Fund fund) async {
@@ -55,6 +61,19 @@ class HiveService {
   static Future<void> clearAllData() async {
     await fundsBox.clear();
     await portfolioBox.clear();
+    await snapshotBox.clear();
+  }
+
+  static Future<void> saveRebalanceSnapshot(RebalanceSnapshot snapshot) async {
+    await snapshotBox.put('current_snapshot', snapshot);
+  }
+
+  static RebalanceSnapshot? getRebalanceSnapshot() {
+    return snapshotBox.get('current_snapshot');
+  }
+
+  static Future<void> clearRebalanceSnapshot() async {
+    await snapshotBox.delete('current_snapshot');
   }
 
   static Future<void> close() async {

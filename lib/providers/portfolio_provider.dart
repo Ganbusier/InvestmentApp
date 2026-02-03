@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/models/portfolio.dart';
+import 'package:investment_app/models/rebalance_snapshot.dart';
 import 'package:investment_app/services/hive_service.dart';
 import 'package:investment_app/services/portfolio_calculator.dart';
 import 'package:investment_app/services/rebalance_calculator.dart';
@@ -9,6 +10,7 @@ class PortfolioProvider with ChangeNotifier {
   Portfolio? _portfolio;
   PortfolioCalculator? _calculator;
   RebalanceCalculator? _rebalanceCalculator;
+  RebalanceSnapshot? _rebalanceSnapshot;
 
   PortfolioProvider() {
     loadPortfolio();
@@ -17,10 +19,12 @@ class PortfolioProvider with ChangeNotifier {
   Portfolio? get portfolio => _portfolio;
   PortfolioCalculator? get calculator => _calculator;
   RebalanceCalculator? get rebalanceCalculator => _rebalanceCalculator;
+  RebalanceSnapshot? get rebalanceSnapshot => _rebalanceSnapshot;
 
   bool get isLoaded => _portfolio != null;
   bool get hasWarnings => _calculator?.hasAnyWarning ?? false;
   bool get needsRebalancing => _rebalanceCalculator?.needsRebalancing ?? false;
+  bool get canUndoRebalance => _rebalanceSnapshot != null;
 
   double get totalAmount => _portfolio?.totalAmount ?? 0;
 
@@ -44,6 +48,7 @@ class PortfolioProvider with ChangeNotifier {
     _portfolio = HiveService.getPortfolio();
     _calculator = PortfolioCalculator(portfolio: _portfolio!);
     _rebalanceCalculator = RebalanceCalculator(portfolio: _portfolio!);
+    _rebalanceSnapshot = HiveService.getRebalanceSnapshot();
     notifyListeners();
   }
 
@@ -73,5 +78,180 @@ class PortfolioProvider with ChangeNotifier {
 
   List<PortfolioCategory> getWarningCategories() {
     return _calculator?.getWarningCategories() ?? [];
+  }
+
+  RebalancePreview previewRebalance() {
+    if (_portfolio == null || _portfolio!.funds.isEmpty) {
+      return RebalancePreview(
+        categoryChanges: {},
+        fundChanges: [],
+        totalBuy: 0,
+        totalSell: 0,
+      );
+    }
+
+    final totalAmount = _portfolio!.totalAmount;
+    final targetAmounts = <PortfolioCategory, double>{};
+    final categoryTotals = <PortfolioCategory, double>{};
+
+    for (final category in PortfolioCategory.values) {
+      targetAmounts[category] = totalAmount * 0.25;
+      categoryTotals[category] = _portfolio!.getAmountByCategory(category);
+    }
+
+    final categoryChanges = <PortfolioCategory, double>{};
+    final fundChanges = <FundChange>[];
+    double totalBuy = 0;
+    double totalSell = 0;
+
+    for (final fund in _portfolio!.funds) {
+      final target = targetAmounts[fund.category]!;
+      final categoryTotal = categoryTotals[fund.category]!;
+      final categoryAdjustment = target - categoryTotal;
+
+      double newAmount;
+      if (categoryTotal == 0) {
+        final categoryFunds = _portfolio!.getFundsByCategory(fund.category);
+        newAmount = target / (categoryFunds.isEmpty ? 1 : categoryFunds.length);
+      } else {
+        newAmount = fund.amount + (categoryAdjustment * (fund.amount / categoryTotal));
+      }
+
+      final change = newAmount - fund.amount;
+      fundChanges.add(FundChange(
+        fundId: fund.id,
+        fundName: fund.name,
+        category: fund.category,
+        currentAmount: fund.amount,
+        targetAmount: newAmount,
+        change: change,
+      ));
+
+      if (change > 0) totalBuy += change;
+      if (change < 0) totalSell += change.abs();
+    }
+
+    for (final category in PortfolioCategory.values) {
+      categoryChanges[category] = targetAmounts[category]! - categoryTotals[category]!;
+    }
+
+    return RebalancePreview(
+      categoryChanges: categoryChanges,
+      fundChanges: fundChanges,
+      totalBuy: totalBuy,
+      totalSell: totalSell,
+    );
+  }
+
+  Future<bool> executeRebalance() async {
+    if (_portfolio == null || _portfolio!.funds.isEmpty) return false;
+    if (_rebalanceSnapshot != null) return false;
+
+    final snapshot = RebalanceSnapshot.fromFunds(
+      _portfolio!.funds.map((f) => f.copyWith()).toList(),
+      _portfolio!.totalAmount,
+    );
+    await HiveService.saveRebalanceSnapshot(snapshot);
+
+    final totalAmount = _portfolio!.totalAmount;
+    final targetAmounts = <PortfolioCategory, double>{};
+    final categoryTotals = <PortfolioCategory, double>{};
+
+    for (final category in PortfolioCategory.values) {
+      targetAmounts[category] = totalAmount * 0.25;
+      categoryTotals[category] = _portfolio!.getAmountByCategory(category);
+    }
+
+    for (final fund in _portfolio!.funds) {
+      final target = targetAmounts[fund.category]!;
+      final categoryTotal = categoryTotals[fund.category]!;
+      final categoryAdjustment = target - categoryTotal;
+
+      double newAmount;
+      if (categoryTotal == 0) {
+        final categoryFunds = _portfolio!.getFundsByCategory(fund.category);
+        newAmount = target / (categoryFunds.isEmpty ? 1 : categoryFunds.length);
+      } else {
+        newAmount = fund.amount + (categoryAdjustment * (fund.amount / categoryTotal));
+      }
+
+      final updatedFund = fund.copyWith(amount: newAmount);
+      await HiveService.updateFund(updatedFund);
+    }
+
+    await HiveService.saveLastRebalanced(DateTime.now());
+    _rebalanceSnapshot = snapshot;
+    await loadPortfolio();
+    return true;
+  }
+
+  Future<bool> undoRebalance() async {
+    if (_rebalanceSnapshot == null) return false;
+
+    for (final fundSnapshot in _rebalanceSnapshot!.funds) {
+      final originalFund = _portfolio!.funds.firstWhere(
+        (f) => f.id == fundSnapshot.fundId,
+        orElse: () => Fund(
+          id: fundSnapshot.fundId,
+          name: fundSnapshot.name,
+          code: '',
+          category: fundSnapshot.category,
+          amount: fundSnapshot.amount,
+        ),
+      );
+      final fund = originalFund.copyWith(amount: fundSnapshot.amount);
+      await HiveService.updateFund(fund);
+    }
+
+    await HiveService.clearRebalanceSnapshot();
+    _rebalanceSnapshot = null;
+    await loadPortfolio();
+    return true;
+  }
+
+  Future<void> loadRebalanceSnapshot() async {
+    _rebalanceSnapshot = HiveService.getRebalanceSnapshot();
+    notifyListeners();
+  }
+}
+
+class FundChange {
+  final String fundId;
+  final String fundName;
+  final PortfolioCategory category;
+  final double currentAmount;
+  final double targetAmount;
+  final double change;
+
+  FundChange({
+    required this.fundId,
+    required this.fundName,
+    required this.category,
+    required this.currentAmount,
+    required this.targetAmount,
+    required this.change,
+  });
+
+  bool get isBuy => change > 0;
+  bool get isSell => change < 0;
+  bool get isUnchanged => change == 0;
+}
+
+class RebalancePreview {
+  final Map<PortfolioCategory, double> categoryChanges;
+  final List<FundChange> fundChanges;
+  final double totalBuy;
+  final double totalSell;
+
+  RebalancePreview({
+    required this.categoryChanges,
+    required this.fundChanges,
+    required this.totalBuy,
+    required this.totalSell,
+  });
+
+  List<FundChange> get meaningfulChanges {
+    return fundChanges.where((c) => c.change.abs() > 1).toList()
+      ..sort((a, b) => b.change.abs().compareTo(a.change.abs()));
   }
 }
