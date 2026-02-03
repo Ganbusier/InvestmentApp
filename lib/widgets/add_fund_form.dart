@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/utils/constants.dart';
+import 'package:investment_app/theme/app_theme.dart';
 
 class AddFundForm extends StatefulWidget {
   final Fund? existingFund;
-  final VoidCallback? onSaved;
+  final void Function(Fund fund)? onSaved;
+  final PortfolioCategory? initialCategory;
 
   const AddFundForm({
     super.key,
     this.existingFund,
     this.onSaved,
+    this.initialCategory,
   });
 
   @override
@@ -31,7 +33,7 @@ class _AddFundFormState extends State<AddFundForm> {
     _amountController = TextEditingController(
       text: widget.existingFund?.amount.toString() ?? '',
     );
-    _category = widget.existingFund?.category ?? PortfolioCategory.stock;
+    _category = widget.existingFund?.category ?? widget.initialCategory ?? PortfolioCategory.stock;
   }
 
   @override
@@ -49,76 +51,36 @@ class _AddFundFormState extends State<AddFundForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextFormField(
+          _buildTextField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: '基金名称',
-              hintText: '请输入基金名称',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return '请输入基金名称';
-              }
-              return null;
-            },
+            label: '基金名称',
+            hint: '请输入基金名称',
+            icon: Icons.label_outline,
           ),
           const SizedBox(height: 16),
-          TextFormField(
+          _buildTextField(
             controller: _codeController,
-            decoration: const InputDecoration(
-              labelText: '基金代码',
-              hintText: '请输入基金代码',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return '请输入基金代码';
-              }
-              return null;
-            },
+            label: '基金代码',
+            hint: '请输入基金代码',
+            icon: Icons.qr_code_2,
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<PortfolioCategory>(
-            value: _category,
-            decoration: const InputDecoration(
-              labelText: '投资类别',
-            ),
-            items: PortfolioCategory.values.map((category) {
-              return DropdownMenuItem(
-                value: category,
-                child: Text(category.displayName),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _category = value!;
-              });
-            },
-          ),
+          _buildCategoryDropdown(),
           const SizedBox(height: 16),
-          TextFormField(
+          _buildTextField(
             controller: _amountController,
-            decoration: const InputDecoration(
-              labelText: '投资金额',
-              hintText: '请输入投资金额',
-              prefixText: '¥ ',
-            ),
+            label: '投资金额',
+            hint: '请输入投资金额',
+            icon: Icons.attach_money,
             keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return '请输入投资金额';
-              }
-              final amount = double.tryParse(value);
-              if (amount == null || amount <= 0) {
-                return '请输入有效金额';
-              }
-              return null;
-            },
+            prefixText: '¥ ',
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
+            height: 52,
+            child: InkWell(
+              onTap: () {
                 if (_formKey.currentState!.validate()) {
                   final fund = Fund(
                     id: widget.existingFund?.id,
@@ -129,14 +91,167 @@ class _AddFundFormState extends State<AddFundForm> {
                     createdAt: widget.existingFund?.createdAt,
                     updatedAt: DateTime.now(),
                   );
-                  Navigator.of(context).pop(fund);
+                  if (widget.onSaved != null) {
+                    widget.onSaved!(fund);
+                  } else {
+                    Navigator.of(context).pop(fund);
+                  }
                 }
               },
-              child: Text(widget.existingFund == null ? '添加基金' : '保存修改'),
+              borderRadius: BorderRadius.circular(14),
+              splashColor: Colors.transparent,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.accentGold, Color(0xFFE8C560)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.accentGold.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    widget.existingFund == null ? '添加基金' : '保存修改',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.primaryDark,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextInputType? keyboardType,
+    String? prefixText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+            prefixText: prefixText,
+            prefixStyle: const TextStyle(color: Colors.white, fontSize: 16),
+            filled: true,
+            fillColor: AppTheme.surfaceLight,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF2D4A6A), width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppTheme.accentGold, width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return '请输入$label';
+            }
+            if (keyboardType == TextInputType.number) {
+              final amount = double.tryParse(value);
+              if (amount == null || amount <= 0) {
+                return '请输入有效金额';
+              }
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '投资类别',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceLight,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF2D4A6A), width: 1),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<PortfolioCategory>(
+              value: _category,
+              dropdownColor: AppTheme.surface,
+              icon: const Icon(Icons.expand_more, color: AppTheme.accentGold),
+              isExpanded: true,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              items: PortfolioCategory.values.map((category) {
+                final color = AppTheme.getCategoryColor(category);
+                return DropdownMenuItem(
+                  value: category,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(category.displayName),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _category = value;
+                  });
+                }
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/services/rebalance_calculator.dart';
 
 class RebalanceActionsWidget extends StatelessWidget {
@@ -13,21 +12,21 @@ class RebalanceActionsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (actions.isEmpty) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.check_circle, color: Colors.green, size: 64),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               '投资组合已平衡',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               '无需进行再平衡操作',
               style: TextStyle(color: Colors.grey),
             ),

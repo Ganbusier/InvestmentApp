@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/models/portfolio.dart';
+import 'package:investment_app/models/target_allocation.dart';
 
 void main() {
   group('Portfolio Model Tests', () {

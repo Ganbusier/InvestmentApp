@@ -1,6 +1,7 @@
 import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/models/portfolio.dart';
 import 'package:investment_app/models/target_allocation.dart';
+import 'package:investment_app/services/portfolio_calculator.dart';
 
 class RebalanceCalculator {
   final Portfolio portfolio;

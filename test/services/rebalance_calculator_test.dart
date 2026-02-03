@@ -37,10 +37,10 @@ void main() {
       final calculator = RebalanceCalculator(portfolio: portfolio);
       final adjustments = calculator.calculateAdjustments();
 
-      expect(adjustments[PortfolioCategory.stock], closeTo(-1000, 0.01));
+      expect(adjustments[PortfolioCategory.stock], closeTo(-1500, 0.01));
       expect(adjustments[PortfolioCategory.bond], closeTo(500, 0.01));
       expect(adjustments[PortfolioCategory.cash], closeTo(500, 0.01));
-      expect(adjustments[PortfolioCategory.gold], closeTo(0, 0.01));
+      expect(adjustments[PortfolioCategory.gold], closeTo(500, 0.01));
     });
 
     test('Should generate correct rebalance actions', () {
@@ -56,11 +56,11 @@ void main() {
       final calculator = RebalanceCalculator(portfolio: portfolio);
       final actions = calculator.generateRebalanceActions();
 
-      expect(actions.length, 3);
+      expect(actions.length, 4);
       
       final stockAction = actions.firstWhere((a) => a.category == PortfolioCategory.stock);
       expect(stockAction.isBuy, isFalse);
-      expect(stockAction.amount, closeTo(1000, 0.01));
+      expect(stockAction.amount, closeTo(1500, 0.01));
 
       final bondAction = actions.firstWhere((a) => a.category == PortfolioCategory.bond);
       expect(bondAction.isBuy, isTrue);

@@ -13,27 +13,83 @@ class PieChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = PortfolioCategory.values.map((category) {
+    final categories =
+        PortfolioCategory.values.where((c) => (percentages[c] ?? 0) > 0).toList();
+
+    if (categories.isEmpty) {
+      return const Center(
+        child: Text(
+          '暂无投资数据',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.white54,
+          ),
+        ),
+      );
+    }
+
+    final data = categories.map((category) {
+      final percentage = (percentages[category] ?? 0) * 100;
+      final color = AppTheme.getCategoryColor(category);
+
       return PieChartSectionData(
-        value: (percentages[category] ?? 0) * 100,
-        title: '${((percentages[category] ?? 0) * 100).toStringAsFixed(0)}%',
-        color: AppTheme.getCategoryColor(category),
+        value: percentage,
+        color: color,
+        radius: 45,
+        title:
+            '${category.displayName}\n${percentage.toStringAsFixed(2)}%',
         titleStyle: const TextStyle(
           color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+          shadows: [
+            Shadow(
+              color: Colors.black26,
+              offset: Offset(0, 1),
+              blurRadius: 2,
+            ),
+          ],
         ),
+        showTitle: true,
+        titlePositionPercentageOffset: 1.45,
       );
     }).toList();
 
-    return AspectRatio(
-      aspectRatio: 1,
-      child: PieChart(
-        PieChartData(
-          sections: data,
-          centerSpaceRadius: 40,
-          sectionsSpace: 2,
-        ),
+    return SizedBox(
+      height: 200,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PieChart(
+            PieChartData(
+              sections: data,
+              centerSpaceRadius: 45,
+              sectionsSpace: 1,
+              pieTouchData: PieTouchData(enabled: true),
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '总投资',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                '100%',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

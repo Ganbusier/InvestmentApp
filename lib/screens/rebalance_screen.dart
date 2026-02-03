@@ -3,7 +3,6 @@ import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/providers/portfolio_provider.dart';
 import 'package:investment_app/theme/app_theme.dart';
 import 'package:investment_app/utils/formatters.dart';
-import 'package:investment_app/widgets/rebalance_actions_widget.dart';
 import 'package:provider/provider.dart';
 
 class RebalanceScreen extends StatelessWidget {
@@ -12,8 +11,23 @@ class RebalanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('再平衡'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Row(
+          children: [
+            SizedBox(width: 8),
+            Text(
+              '再平衡',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Consumer<PortfolioProvider>(
         builder: (context, provider, child) {
@@ -21,15 +35,16 @@ class RebalanceScreen extends StatelessWidget {
           final needsRebalancing = provider.needsRebalancing;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildStatusCard(needsRebalancing, provider),
-                const SizedBox(height: 16),
-                _buildCurrentAllocation(provider),
-                const SizedBox(height: 16),
+                _buildStatusCard(needsRebalancing, provider, context),
+                const SizedBox(height: 20),
+                _buildCurrentAllocation(context, provider),
+                const SizedBox(height: 20),
                 _buildActionsCard(actions),
+                const SizedBox(height: 100),
               ],
             ),
           );
@@ -38,174 +53,414 @@ class RebalanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusCard(bool needsRebalancing, PortfolioProvider provider) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Icon(
-              needsRebalancing ? Icons.warning : Icons.check_circle,
-              color: needsRebalancing ? AppTheme.warning : Colors.green,
-              size: 48,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              needsRebalancing ? '需要再平衡' : '投资组合已平衡',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: needsRebalancing ? AppTheme.warning : Colors.green,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              needsRebalancing
-                  ? '当前投资比例偏离目标配置，建议进行调整'
-                  : '各类别比例在目标范围内，无需调整',
-              style: const TextStyle(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            if (needsRebalancing) ...[
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.swap_horiz),
-                label: const Text('执行再平衡'),
-              ),
-            ],
+  Widget _buildStatusCard(bool needsRebalancing, PortfolioProvider provider, BuildContext context) {
+    final statusColor = needsRebalancing ? AppTheme.warning : AppTheme.success;
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            statusColor.withValues(alpha: 0.15),
+            statusColor.withValues(alpha: 0.05),
           ],
         ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(
+              needsRebalancing ? Icons.warning_amber : Icons.check_circle,
+              color: statusColor,
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            needsRebalancing ? '需要再平衡' : '投资组合已平衡',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: statusColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            needsRebalancing
+                ? '当前投资比例偏离目标配置，建议进行调整以恢复平衡'
+                : '各类别比例在目标范围内，投资组合保持健康',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withValues(alpha: 0.6),
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+           ),
+           if (needsRebalancing) ...[
+             const SizedBox(height: 24),
+             InkWell(
+               onTap: () {
+                 provider.recordRebalance();
+                 ScaffoldMessenger.of(context).showSnackBar(
+                   SnackBar(
+                     content: const Row(
+                       children: [
+                         Icon(Icons.check_circle, color: Colors.white),
+                         SizedBox(width: 10),
+                         Text('已执行再平衡'),
+                       ],
+                     ),
+                     backgroundColor: AppTheme.success,
+                     behavior: SnackBarBehavior.floating,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12),
+                     ),
+                   ),
+                 );
+               },
+               borderRadius: BorderRadius.circular(14),
+               splashColor: Colors.transparent,
+               child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.accentGold, Color(0xFFE8C560)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.accentGold.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.swap_horiz, color: AppTheme.primaryDark),
+                    SizedBox(width: 10),
+                    Text(
+                      '执行再平衡',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.primaryDark,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
 
-  Widget _buildCurrentAllocation(PortfolioProvider provider) {
+  Widget _buildCurrentAllocation(BuildContext context, PortfolioProvider provider) {
     final percentages = provider.categoryPercentages;
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '当前配置',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ...PortfolioCategory.values.map((category) {
-              final percentage = percentages[category] ?? 0;
-              final deviation = percentage - 0.25;
-              final color = AppTheme.getCategoryColor(category);
-              final deviationColor = deviation > 0
-                  ? Colors.red
-                  : deviation < 0
-                      ? Colors.blue
-                      : Colors.green;
-              final deviationText =
-                  deviation >= 0 ? '+${(deviation * 100).toStringAsFixed(1)}%' : '${(deviation * 100).toStringAsFixed(1)}%';
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(category.displayName),
-                          LinearProgressIndicator(
-                            value: percentage,
-                            backgroundColor: Colors.grey[200],
-                            valueColor: AlwaysStoppedAnimation<Color>(color),
-                            minHeight: 6,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          Formatters.formatPercent(percentage),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          deviationText,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: deviationColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+    return Container(
+      decoration: AppTheme.getCardDecoration(),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.primary.withValues(alpha: 0.2),
+                      AppTheme.primary.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              );
-            }),
-          ],
-        ),
+                child: const Icon(Icons.pie_chart, color: AppTheme.accentGold, size: 22),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                '当前配置',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ...PortfolioCategory.values.map((category) {
+            final percentage = percentages[category] ?? 0;
+            final deviation = percentage - 0.25;
+            final color = AppTheme.getCategoryColor(category);
+            final deviationColor = deviation > 0
+                ? AppTheme.error
+                : deviation < 0
+                    ? color
+                    : AppTheme.success;
+            final deviationText =
+                deviation >= 0 ? '+${(deviation * 100).toStringAsFixed(1)}%' : '${(deviation * 100).toStringAsFixed(1)}%';
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        category.displayName,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          Formatters.formatPercent(percentage),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: color,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        deviationText,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: deviationColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      Container(
+                        height: 10,
+                        width: (screenWidth - 88).clamp(0, double.infinity) * percentage.clamp(0.0, 1.0),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [color, color.withValues(alpha: 0.7)],
+                          ),
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
 
   Widget _buildActionsCard(List<dynamic> actions) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '操作建议',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (actions.isEmpty)
-              const Center(
-                heightFactor: 2,
-                child: Text(
-                  '无需进行再平衡操作',
-                  style: TextStyle(color: Colors.grey),
+    return Container(
+      decoration: AppTheme.getCardDecoration(),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.success.withValues(alpha: 0.2),
+                      AppTheme.success.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              )
-            else
-              ...actions.map((action) {
-                final rebalanceAction = action as dynamic;
-                final isBuy = rebalanceAction.isBuy;
-                return ListTile(
-                  leading: Icon(
-                    isBuy ? Icons.add_circle : Icons.remove_circle,
-                    color: isBuy ? Colors.green : Colors.red,
+                child: const Icon(Icons.lightbulb_outline, color: AppTheme.success, size: 22),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                '操作建议',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          if (actions.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.success.withValues(alpha: 0.1),
+                    AppTheme.success.withValues(alpha: 0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.success.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.check_circle, color: AppTheme.success, size: 48),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '无需进行再平衡操作',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.success,
+                    ),
                   ),
-                  title: Text(rebalanceAction.description),
-                  subtitle: Text(
-                    isBuy ? '建议买入以恢复平衡' : '建议卖出以恢复平衡',
+                  const SizedBox(height: 4),
+                  Text(
+                    '您的投资组合已接近目标配置',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
                   ),
-                );
-              }),
-          ],
-        ),
+                ],
+              ),
+            )
+          else
+            ...actions.map((action) {
+              final rebalanceAction = action as dynamic;
+              final isBuy = rebalanceAction.isBuy;
+              final actionColor = isBuy ? AppTheme.success : AppTheme.error;
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      actionColor.withValues(alpha: 0.1),
+                      actionColor.withValues(alpha: 0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: actionColor.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: actionColor.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        isBuy ? Icons.add_circle : Icons.remove_circle,
+                        color: actionColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            rebalanceAction.description,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            isBuy ? '建议买入以恢复平衡' : '建议卖出以恢复平衡',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: actionColor.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        isBuy ? '买入' : '卖出',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: actionColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+        ],
       ),
     );
   }

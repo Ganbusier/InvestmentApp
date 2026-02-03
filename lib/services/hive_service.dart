@@ -27,7 +27,7 @@ class HiveService {
   }
 
   static Future<void> updateFund(Fund fund) async {
-    await fund.save();
+    await fundsBox.put(fund.id, fund);
   }
 
   static Future<void> deleteFund(String fundId) async {

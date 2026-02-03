@@ -14,32 +14,65 @@ class WarningBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.warning.withOpacity(0.1),
-        border: Border.all(color: AppTheme.warning.withOpacity(0.3)),
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.warning.withValues(alpha: 0.15),
+            AppTheme.warning.withValues(alpha: 0.05),
+          ],
+        ),
+        border: Border.all(
+          color: AppTheme.warning.withValues(alpha: 0.3),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: AppTheme.warning),
-          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.warning.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.warning_amber_rounded, color: AppTheme.warning, size: 22),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppTheme.warning,
-                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ),
+           ),
           if (onAction != null)
-            TextButton(
-              onPressed: onAction,
-              child: const Text(
-                '查看详情',
-                style: TextStyle(color: AppTheme.warning),
+            InkWell(
+              onTap: onAction,
+              borderRadius: BorderRadius.circular(10),
+              splashColor: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme.warning.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppTheme.warning.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Text(
+                  '查看详情',
+                  style: TextStyle(
+                    color: AppTheme.warning,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
         ],

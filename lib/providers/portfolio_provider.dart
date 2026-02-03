@@ -10,6 +10,10 @@ class PortfolioProvider with ChangeNotifier {
   PortfolioCalculator? _calculator;
   RebalanceCalculator? _rebalanceCalculator;
 
+  PortfolioProvider() {
+    loadPortfolio();
+  }
+
   Portfolio? get portfolio => _portfolio;
   PortfolioCalculator? get calculator => _calculator;
   RebalanceCalculator? get rebalanceCalculator => _rebalanceCalculator;
