@@ -415,3 +415,138 @@ flutter test: 12 passed (模型测试)
 | 监控提醒 | ✅ 偏离预警 |
 | 再平衡指引 | ✅ 预览、执行、撤销功能 |
 | 撤销功能 | ✅ 单次撤销，无时间限制 |
+
+---
+
+## M21：基金删除撤销功能 2026-02-03
+
+### 功能描述
+
+为基金删除功能增加撤销能力：
+- 保留最多 10 条删除历史记录
+- 支持多次撤销
+- 用户友好性：提供清晰的撤销提示和操作入口
+
+### 数据模型
+
+```dart
+// lib/models/fund_deletion_history.dart
+@HiveType(typeId: 5)
+class FundDeletionHistory {
+  @HiveField(0) final String id;
+  @HiveField(1) final DateTime timestamp;
+  @HiveField(2) final List<DeletedFundSnapshot> deletedFunds;
+  @HiveField(3) final int order; // FIFO 队列管理
+}
+
+@HiveType(typeId: 6)
+class DeletedFundSnapshot {
+  @HiveField(0) final String fundId;
+  @HiveField(1) final String name;
+  @HiveField(2) final String code;
+  @HiveField(3) final PortfolioCategory category;
+  @HiveField(4) final double amount;
+}
+```
+
+### 新增文件
+
+| 文件 | 说明 |
+|------|------|
+| `lib/models/fund_deletion_history.dart` | 删除历史记录数据模型 |
+| `lib/models/fund_deletion_history.g.dart` | Hive 自动生成的适配器 |
+
+### 修改的文件
+
+| 文件 | 变更 |
+|------|------|
+| `lib/services/hive_service.dart` | 注册新适配器，添加删除历史管理方法 |
+| `lib/providers/portfolio_provider.dart` | 添加删除/撤销逻辑和历史状态 |
+| `lib/screens/fund_list_screen.dart` | 添加撤销按钮、SnackBar 和历史对话框 |
+
+### 功能特性
+
+1. **自动保存删除记录**：删除基金时自动保存到历史
+2. **保留 10 条历史**：FIFO 队列，超过自动清理最旧的
+3. **多次撤销支持**：可撤销最近任意一次删除操作
+4. **双重撤销入口**：
+   - 删除后 5 秒内显示可撤销 SnackBar
+   - AppBar 撤销图标点击显示历史列表
+
+### Git 提交
+
+```
+fc4e840 feat: 添加基金删除撤销功能（M21）
+```
+
+---
+
+## M22：修复基金删除确认对话框重复问题 2026-02-03
+
+### 问题描述
+
+1. **确认对话框出现两次**：滑动删除时会弹出两个确认删除对话框
+2. **选择不一致导致错误**：第一次确认后基金已删除，若第二次选择取消，会导致删除历史未记录、后续删除操作报错
+
+### 根因分析
+
+```
+用户滑动删除
+    ↓
+Dismissible.confirmDismiss (fund_card.dart)
+    ↓ 第一次 showDialog
+Dismissible.onDismissed → onDelete?.call()
+    ↓
+_fund_list_screen.dart._confirmDelete
+    ↓ 第二次 showDialog
+```
+
+### 解决方案
+
+1. **移除 fund_card.dart 的确认对话框**：统一由 fund_list_screen.dart 的 `_confirmDelete` 处理确认
+2. **添加防重复删除机制**：使用 `_deletingFundIds` Set 防止重复调用
+
+### 修改的文件
+
+| 文件 | 变更 |
+|------|------|
+| `lib/widgets/fund_card.dart` | 简化 confirmDismiss 回调，直接返回 true |
+| `lib/providers/portfolio_provider.dart` | 添加 `_deletingFundIds` 防重复删除机制 |
+
+### Git 提交
+
+```
+1d51efb fix: 修复基金删除确认对话框重复问题（M22）
+```
+
+---
+
+## 当前项目状态
+
+| 阶段 | 状态 | 说明 |
+|------|------|------|
+| M1-M16 | ✅ 已完成 | 基础功能和UI |
+| M17 | ✅ 已完成 | 再平衡功能 |
+| M18 | ✅ 已完成 | 首页跳转 |
+| M19 | ✅ 已完成 | 代码清理 |
+| M20 | ✅ 已完成 | 全选功能修复 |
+| M21 | ✅ 已完成 | 基金删除撤销功能 |
+| M22 | ✅ 已完成 | 删除确认对话框修复 |
+
+### 技术状态
+
+| 指标 | 状态 |
+|------|------|
+| flutter analyze | ✅ 0 errors (6 个 info 警告) |
+| Git status | ✅ 已推送到远程 |
+
+### 核心功能状态
+
+| 功能 | 状态 | 描述 |
+|------|------|------|
+| 基金录入 | ✅ 完整 | 添加、编辑、删除 |
+| 统计可视化 | ✅ 完整 | 饼图、类别分布 |
+| 监控提醒 | ✅ 完整 | 偏离预警 |
+| 再平衡功能 | ✅ 完整 | 预览、执行、撤销 |
+| 删除撤销 | ✅ 完整 | 最多 10 条历史，多次撤销 |
+| 项目规则 | ✅ 已建立 | superpowers 规范、方案保存、状态记录 |
