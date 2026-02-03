@@ -1,0 +1,28 @@
+name: investment_app
+description: 永久投资组合理财App
+
+publish_to: none
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  hive_flutter: ^2.0.0
+  provider: ^6.0.5
+  fl_chart: ^0.63.0
+  intl: ^0.18.1
+  uuid: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  hive_generator: ^2.0.0
+  build_runner: ^2.4.0
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
