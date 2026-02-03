@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:investment_app/models/fund.dart';
+import 'package:investment_app/models/fund_deletion_history.dart';
 import 'package:investment_app/models/portfolio.dart';
 import 'package:investment_app/models/rebalance_snapshot.dart';
 import 'package:investment_app/services/hive_service.dart';
@@ -11,6 +12,7 @@ class PortfolioProvider with ChangeNotifier {
   PortfolioCalculator? _calculator;
   RebalanceCalculator? _rebalanceCalculator;
   RebalanceSnapshot? _rebalanceSnapshot;
+  List<FundDeletionHistory> _deletionHistory = [];
   int? _selectedTabIndex;
 
   PortfolioProvider() {
@@ -21,12 +23,14 @@ class PortfolioProvider with ChangeNotifier {
   PortfolioCalculator? get calculator => _calculator;
   RebalanceCalculator? get rebalanceCalculator => _rebalanceCalculator;
   RebalanceSnapshot? get rebalanceSnapshot => _rebalanceSnapshot;
+  List<FundDeletionHistory> get deletionHistory => _deletionHistory;
   int? get selectedTabIndex => _selectedTabIndex;
 
   bool get isLoaded => _portfolio != null;
   bool get hasWarnings => _calculator?.hasAnyWarning ?? false;
   bool get needsRebalancing => _rebalanceCalculator?.needsRebalancing ?? false;
   bool get canUndoRebalance => _rebalanceSnapshot != null;
+  bool get canUndo => _deletionHistory.isNotEmpty;
 
   double get totalAmount => _portfolio?.totalAmount ?? 0;
 
@@ -51,6 +55,7 @@ class PortfolioProvider with ChangeNotifier {
     _calculator = PortfolioCalculator(portfolio: _portfolio!);
     _rebalanceCalculator = RebalanceCalculator(portfolio: _portfolio!);
     _rebalanceSnapshot = HiveService.getRebalanceSnapshot();
+    await loadDeletionHistory();
     notifyListeners();
   }
 
@@ -65,8 +70,53 @@ class PortfolioProvider with ChangeNotifier {
   }
 
   Future<void> deleteFund(String fundId) async {
+    final fund = HiveService.getFund(fundId);
+    if (fund != null) {
+      final history = FundDeletionHistory.fromDeletedFund(fund, _deletionHistory.length);
+      await HiveService.saveDeletionHistory(history);
+      await HiveService.clearOldestHistory(10);
+    }
     await HiveService.deleteFund(fundId);
     await loadPortfolio();
+  }
+
+  Future<void> deleteFunds(List<String> fundIds) async {
+    final deletedFunds = <Fund>[];
+    for (final id in fundIds) {
+      final fund = HiveService.getFund(id);
+      if (fund != null) {
+        deletedFunds.add(fund);
+        await HiveService.deleteFund(id);
+      }
+    }
+    if (deletedFunds.isNotEmpty) {
+      final history = FundDeletionHistory.fromDeletedFunds(deletedFunds, _deletionHistory.length);
+      await HiveService.saveDeletionHistory(history);
+      await HiveService.clearOldestHistory(10);
+    }
+    await loadPortfolio();
+  }
+
+  Future<bool> undoLastDeletion() async {
+    if (_deletionHistory.isEmpty) return false;
+
+    final lastHistory = _deletionHistory.last;
+    for (final fundSnapshot in lastHistory.deletedFunds) {
+      await HiveService.addFund(fundSnapshot.toFund());
+    }
+    await HiveService.removeDeletionHistory(lastHistory.id);
+    await loadPortfolio();
+    return true;
+  }
+
+  Future<void> loadDeletionHistory() async {
+    _deletionHistory = HiveService.getDeletionHistory(limit: 10);
+  }
+
+  Future<void> clearAllDeletionHistory() async {
+    await HiveService.clearAllDeletionHistory();
+    _deletionHistory = [];
+    notifyListeners();
   }
 
   Future<void> recordRebalance() async {

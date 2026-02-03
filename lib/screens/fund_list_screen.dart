@@ -32,14 +32,15 @@ class _FundListScreenState extends State<FundListScreen> {
   void _toggleFundSelection(String fundId) {
     final provider = Provider.of<PortfolioProvider>(context, listen: false);
     final funds = provider.getAllFunds();
-    
+
     setState(() {
       if (_selectedFundIds.contains(fundId)) {
         _selectedFundIds.remove(fundId);
       } else {
         _selectedFundIds.add(fundId);
       }
-      _isAllSelected = _selectedFundIds.isNotEmpty && _selectedFundIds.length == funds.length;
+      _isAllSelected = _selectedFundIds.isNotEmpty &&
+          _selectedFundIds.length == funds.length;
     });
   }
 
@@ -84,7 +85,8 @@ class _FundListScreenState extends State<FundListScreen> {
                   color: AppTheme.deleteColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: const Icon(Icons.delete_sweep, color: AppTheme.deleteColor, size: 36),
+                child: const Icon(Icons.delete_sweep,
+                    color: AppTheme.deleteColor, size: 36),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -111,11 +113,13 @@ class _FundListScreenState extends State<FundListScreen> {
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                        side: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.2)),
                       ),
                       child: Text(
                         '取消',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7)),
                       ),
                     ),
                   ),
@@ -124,29 +128,13 @@ class _FundListScreenState extends State<FundListScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.pop(context);
-                        for (final fundId in _selectedFundIds) {
-                          await provider.deleteFund(fundId);
-                        }
+                        final deletedCount = _selectedFundIds.length;
+                        await provider.deleteFunds(_selectedFundIds.toList());
                         setState(() {
                           _selectedFundIds.clear();
                           _isEditMode = false;
                         });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(Icons.check_circle, color: Colors.white),
-                                const SizedBox(width: 10),
-                                Text('已删除 ${_selectedFundIds.length} 只基金'),
-                              ],
-                            ),
-                            backgroundColor: AppTheme.success,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
+                        _showUndoSnackBar(context, provider, deletedCount);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.deleteColor,
@@ -158,6 +146,166 @@ class _FundListScreenState extends State<FundListScreen> {
                   ),
                 ],
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showUndoSnackBar(
+      BuildContext context, PortfolioProvider provider, int count) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 10),
+            Text('已删除 $count 只基金'),
+          ],
+        ),
+        action: SnackBarAction(
+          label: '撤销',
+          textColor: AppTheme.accentGold,
+          onPressed: () async {
+            await provider.undoLastDeletion();
+          },
+        ),
+        backgroundColor: AppTheme.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showUndoHistoryDialog(
+      BuildContext context, PortfolioProvider provider) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: AppTheme.cardBackground,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.cardBackground,
+                AppTheme.cardBackgroundAlt,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.accentGold.withValues(alpha: 0.2),
+                          AppTheme.accentGold.withValues(alpha: 0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child:
+                        const Icon(Icons.restore, color: AppTheme.accentGold),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    '撤销删除',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '可撤销最近 ${provider.deletionHistory.length} 次删除操作',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: provider.deletionHistory.reversed.map((history) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surface.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          dense: true,
+                          title: Text(
+                            '${history.deletedFunds.length} 只基金',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${history.deletedFunds.map((f) => f.name).join(', ')}',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: TextButton(
+                            child: const Text(
+                              '撤销',
+                              style: TextStyle(
+                                color: AppTheme.accentGold,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            onPressed: () async {
+                              Navigator.pop(context);
+                              await provider.undoLastDeletion();
+                            },
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              if (provider.deletionHistory.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      await provider.clearAllDeletionHistory();
+                    },
+                    child: Text(
+                      '清除历史记录',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -181,6 +329,21 @@ class _FundListScreenState extends State<FundListScreen> {
           ),
         ),
         actions: [
+          if (!_isEditMode && context.watch<PortfolioProvider>().canUndo)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(6),
+                  child: const Icon(Icons.restore, color: AppTheme.accentGold),
+                ),
+                onPressed: () => _showUndoHistoryDialog(
+                  context,
+                  Provider.of<PortfolioProvider>(context, listen: false),
+                ),
+                tooltip: '撤销删除',
+              ),
+            ),
           if (_isEditMode)
             Padding(
               padding: const EdgeInsets.only(right: 8),
@@ -199,7 +362,8 @@ class _FundListScreenState extends State<FundListScreen> {
                 onPressed: _toggleEditMode,
                 icon: Container(
                   padding: const EdgeInsets.all(6),
-                  child: const Icon(Icons.edit_outlined, color: AppTheme.accentGold),
+                  child: const Icon(Icons.edit_outlined,
+                      color: AppTheme.accentGold),
                 ),
                 label: const Text(
                   '编辑',
@@ -217,7 +381,8 @@ class _FundListScreenState extends State<FundListScreen> {
                 ),
                 icon: Container(
                   padding: const EdgeInsets.all(6),
-                  child: const Icon(Icons.delete_outline, color: AppTheme.deleteColor),
+                  child: const Icon(Icons.delete_outline,
+                      color: AppTheme.deleteColor),
                 ),
                 label: Text(
                   '删除 ${_selectedFundIds.length}',
@@ -275,13 +440,14 @@ class _FundListScreenState extends State<FundListScreen> {
                       color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
-                   const SizedBox(height: 32),
+                  const SizedBox(height: 32),
                   InkWell(
                     onTap: () => _showAddFundDialog(context),
                     borderRadius: BorderRadius.circular(14),
                     splashColor: Colors.transparent,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 16),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [AppTheme.accentGold, Color(0xFFE8C560)],
@@ -321,8 +487,10 @@ class _FundListScreenState extends State<FundListScreen> {
             children: [
               if (_isEditMode)
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -336,55 +504,57 @@ class _FundListScreenState extends State<FundListScreen> {
                       width: 1,
                     ),
                   ),
-                    child: Row(
-                      children: [
-                        InkWell(
-                          onTap: () => _selectAll(funds),
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () => _selectAll(funds),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _isAllSelected
+                                ? AppTheme.accentGold
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
                               color: _isAllSelected
                                   ? AppTheme.accentGold
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: _isAllSelected
-                                    ? AppTheme.accentGold
-                                    : Colors.white.withValues(alpha: 0.2),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _isAllSelected
-                                      ? Icons.check_circle
-                                      : Icons.radio_button_unchecked,
-                                  color: _isAllSelected
-                                      ? AppTheme.primaryDark
-                                      : Colors.white.withValues(alpha: 0.5),
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  _isAllSelected ? '取消全选' : '全选',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: _isAllSelected
-                                        ? AppTheme.primaryDark
-                                        : Colors.white.withValues(alpha: 0.7),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                                  : Colors.white.withValues(alpha: 0.2),
+                              width: 1.5,
                             ),
                           ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _isAllSelected
+                                    ? Icons.check_circle
+                                    : Icons.radio_button_unchecked,
+                                color: _isAllSelected
+                                    ? AppTheme.primaryDark
+                                    : Colors.white.withValues(alpha: 0.5),
+                                size: 18,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _isAllSelected ? '取消全选' : '全选',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: _isAllSelected
+                                      ? AppTheme.primaryDark
+                                      : Colors.white.withValues(alpha: 0.7),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceLight.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(8),
@@ -410,7 +580,8 @@ class _FundListScreenState extends State<FundListScreen> {
                     final isSelected = _selectedFundIds.contains(fund.id);
 
                     if (_isEditMode) {
-                      return _buildSelectableFundItem(context, fund, isSelected, provider);
+                      return _buildSelectableFundItem(
+                          context, fund, isSelected, provider);
                     }
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
@@ -470,7 +641,9 @@ class _FundListScreenState extends State<FundListScreen> {
               ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? AppTheme.accentGold : Colors.white.withValues(alpha: 0.08),
+          color: isSelected
+              ? AppTheme.accentGold
+              : Colors.white.withValues(alpha: 0.08),
           width: isSelected ? 1.5 : 1,
         ),
       ),
@@ -487,17 +660,27 @@ class _FundListScreenState extends State<FundListScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: isSelected
-                        ? [AppTheme.accentGold, AppTheme.accentGold.withValues(alpha: 0.8)]
-                        : [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
+                        ? [
+                            AppTheme.accentGold,
+                            AppTheme.accentGold.withValues(alpha: 0.8)
+                          ]
+                        : [
+                            color.withValues(alpha: 0.2),
+                            color.withValues(alpha: 0.1)
+                          ],
                   ),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isSelected ? AppTheme.accentGold : color.withValues(alpha: 0.3),
+                    color: isSelected
+                        ? AppTheme.accentGold
+                        : color.withValues(alpha: 0.3),
                     width: isSelected ? 0 : 1,
                   ),
                 ),
                 child: Icon(
-                  isSelected ? Icons.check_circle : _getCategoryIcon(fund.category),
+                  isSelected
+                      ? Icons.check_circle
+                      : _getCategoryIcon(fund.category),
                   color: isSelected ? AppTheme.primaryDark : color,
                   size: 26,
                 ),
@@ -519,7 +702,8 @@ class _FundListScreenState extends State<FundListScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: color.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
@@ -601,7 +785,8 @@ class _FundListScreenState extends State<FundListScreen> {
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.add_circle, color: AppTheme.accentGold),
+                    child: const Icon(Icons.add_circle,
+                        color: AppTheme.accentGold),
                   ),
                   const SizedBox(width: 12),
                   const Text(
@@ -625,7 +810,8 @@ class _FundListScreenState extends State<FundListScreen> {
                         SnackBar(
                           content: Row(
                             children: [
-                              const Icon(Icons.check_circle, color: Colors.white),
+                              const Icon(Icons.check_circle,
+                                  color: Colors.white),
                               const SizedBox(width: 10),
                               Text('已添加 ${fund.name}'),
                             ],
@@ -700,7 +886,8 @@ class _FundListScreenState extends State<FundListScreen> {
                         SnackBar(
                           content: Row(
                             children: [
-                              const Icon(Icons.check_circle, color: Colors.white),
+                              const Icon(Icons.check_circle,
+                                  color: Colors.white),
                               const SizedBox(width: 10),
                               Text('已更新 ${updatedFund.name}'),
                             ],
@@ -723,7 +910,8 @@ class _FundListScreenState extends State<FundListScreen> {
     );
   }
 
-  void _confirmDelete(BuildContext context, Fund fund, PortfolioProvider provider) {
+  void _confirmDelete(
+      BuildContext context, Fund fund, PortfolioProvider provider) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -751,7 +939,8 @@ class _FundListScreenState extends State<FundListScreen> {
                   color: AppTheme.deleteColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: const Icon(Icons.delete_forever, color: AppTheme.deleteColor, size: 36),
+                child: const Icon(Icons.delete_forever,
+                    color: AppTheme.deleteColor, size: 36),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -787,11 +976,13 @@ class _FundListScreenState extends State<FundListScreen> {
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                        side: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.2)),
                       ),
                       child: Text(
                         '取消',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7)),
                       ),
                     ),
                   ),
@@ -801,22 +992,7 @@ class _FundListScreenState extends State<FundListScreen> {
                       onPressed: () async {
                         Navigator.pop(context);
                         await provider.deleteFund(fund.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(Icons.check_circle, color: Colors.white),
-                                const SizedBox(width: 10),
-                                Text('已删除 ${fund.name}'),
-                              ],
-                            ),
-                            backgroundColor: AppTheme.success,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
+                        _showUndoSnackBar(context, provider, 1);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.deleteColor,
