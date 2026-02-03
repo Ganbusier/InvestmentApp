@@ -14,6 +14,7 @@ class PortfolioProvider with ChangeNotifier {
   RebalanceSnapshot? _rebalanceSnapshot;
   List<FundDeletionHistory> _deletionHistory = [];
   int? _selectedTabIndex;
+  final Set<String> _deletingFundIds = {};
 
   PortfolioProvider() {
     loadPortfolio();
@@ -70,14 +71,21 @@ class PortfolioProvider with ChangeNotifier {
   }
 
   Future<void> deleteFund(String fundId) async {
-    final fund = HiveService.getFund(fundId);
-    if (fund != null) {
-      final history = FundDeletionHistory.fromDeletedFund(fund, _deletionHistory.length);
-      await HiveService.saveDeletionHistory(history);
-      await HiveService.clearOldestHistory(10);
+    if (_deletingFundIds.contains(fundId)) return;
+    _deletingFundIds.add(fundId);
+
+    try {
+      final fund = HiveService.getFund(fundId);
+      if (fund != null) {
+        final history = FundDeletionHistory.fromDeletedFund(fund, _deletionHistory.length);
+        await HiveService.saveDeletionHistory(history);
+        await HiveService.clearOldestHistory(10);
+      }
+      await HiveService.deleteFund(fundId);
+      await loadPortfolio();
+    } finally {
+      _deletingFundIds.remove(fundId);
     }
-    await HiveService.deleteFund(fundId);
-    await loadPortfolio();
   }
 
   Future<void> deleteFunds(List<String> fundIds) async {
