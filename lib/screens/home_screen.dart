@@ -276,6 +276,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Consumer<PortfolioProvider>(
         builder: (context, provider, child) {
+          if (provider.shouldShowAddFundDialog) {
+            provider.hideAddFundDialog();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showAddFundDialog();
+            });
+          }
+
           if (!provider.isLoaded) {
             return Center(
               child: Container(

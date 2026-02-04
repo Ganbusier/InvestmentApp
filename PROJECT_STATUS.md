@@ -980,3 +980,35 @@ flutter analyze: ✅ 0 errors (5 个 info 警告)
 ```
 flutter analyze: ✅ 0 errors (6 个 info 警告)
 ```
+
+---
+
+## M32 补充2：修复"去添加基金"按钮跳转问题 2026-02-04
+
+### 问题描述
+
+点击"去添加基金"按钮后直接白屏，无法跳转到首页并显示添加基金对话框。
+
+### 问题根源
+
+`RebalanceScreen` 是 `MainScreen` 的 Tab 之一（通过 `IndexedStack` 管理），不是独立页面。`Navigator.pop(context)` 无效导致白屏。
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/providers/portfolio_provider.dart` | 添加 `shouldShowAddFundDialog` 状态和 `triggerShowAddFundDialog()`、`hideAddFundDialog()` 方法 |
+| `lib/screens/home_screen.dart` | 监听 `shouldShowAddFundDialog` 状态，显示添加基金对话框 |
+| `lib/screens/rebalance_screen.dart` | 移除 `Navigator.pop`，改为触发状态 |
+
+### 预期效果
+
+点击"去添加基金"按钮后：
+1. 切换到首页 Tab
+2. 自动显示添加基金对话框
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (6 个 info 警告)
+```

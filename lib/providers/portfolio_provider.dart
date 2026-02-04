@@ -17,6 +17,7 @@ class PortfolioProvider with ChangeNotifier {
   List<FundDeletionHistory> _deletionHistory = [];
   int? _selectedTabIndex;
   final Set<String> _deletingFundIds = {};
+  bool _showAddFundDialog = false;
 
   PortfolioProvider() {
     loadPortfolio();
@@ -28,6 +29,7 @@ class PortfolioProvider with ChangeNotifier {
   RebalanceSnapshot? get rebalanceSnapshot => _rebalanceSnapshot;
   List<FundDeletionHistory> get deletionHistory => _deletionHistory;
   int? get selectedTabIndex => _selectedTabIndex;
+  bool get shouldShowAddFundDialog => _showAddFundDialog;
 
   bool get isLoaded => _portfolio != null;
   bool get hasWarnings => _calculator?.hasAnyWarning ?? false;
@@ -317,6 +319,16 @@ class PortfolioProvider with ChangeNotifier {
 
   void clearSelectedTab() {
     _selectedTabIndex = null;
+    notifyListeners();
+  }
+
+  void triggerShowAddFundDialog() {
+    _showAddFundDialog = true;
+    notifyListeners();
+  }
+
+  void hideAddFundDialog() {
+    _showAddFundDialog = false;
     notifyListeners();
   }
 }

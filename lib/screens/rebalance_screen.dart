@@ -29,11 +29,15 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppTheme.accentGold, AppTheme.accentGold.withValues(alpha: 0.8)],
+                  colors: [
+                    AppTheme.accentGold,
+                    AppTheme.accentGold.withValues(alpha: 0.8)
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.swap_horiz, color: AppTheme.primaryDark, size: 20),
+              child: const Icon(Icons.swap_horiz,
+                  color: AppTheme.primaryDark, size: 20),
             ),
             const SizedBox(width: 12),
             const Text(
@@ -125,7 +129,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                    side:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -268,21 +273,21 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                             ),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                           child: const Row(
-                             mainAxisAlignment: MainAxisAlignment.center,
-                             children: [
-                               Icon(Icons.undo, color: Colors.white),
-                               SizedBox(width: 10),
-                               Text(
-                                 '撤销',
-                                 style: TextStyle(
-                                   fontSize: 16,
-                                   fontWeight: FontWeight.w700,
-                                   color: Colors.white,
-                                 ),
-                               ),
-                             ],
-                           ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.undo, color: Colors.white),
+                              SizedBox(width: 10),
+                              Text(
+                                '撤销',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -405,19 +410,19 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Column(
-           children: [
-             Icon(Icons.check_circle, color: AppTheme.success, size: 48),
-             SizedBox(height: 12),
-             Text(
-               '投资组合已接近目标配置',
-               style: TextStyle(
-                 fontSize: 16,
-                 fontWeight: FontWeight.w600,
-                 color: AppTheme.success,
-               ),
-             ),
-           ],
-         ),
+          children: [
+            Icon(Icons.check_circle, color: AppTheme.success, size: 48),
+            SizedBox(height: 12),
+            Text(
+              '投资组合已接近目标配置',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.success,
+              ),
+            ),
+          ],
+        ),
       );
     }
 
@@ -439,8 +444,9 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
           ...changes.map((change) {
             final isBuy = change.isBuy;
             final color = isBuy ? AppTheme.success : AppTheme.error;
-            final changeText =
-                isBuy ? '+${Formatters.formatCurrency(change.change)}' : Formatters.formatCurrency(change.change);
+            final changeText = isBuy
+                ? '+${Formatters.formatCurrency(change.change)}'
+                : Formatters.formatCurrency(change.change);
 
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
@@ -546,7 +552,11 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
               style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(height: 16),
-            ...provider.previewRebalance().meaningfulChanges.take(4).map((change) {
+            ...provider
+                .previewRebalance()
+                .meaningfulChanges
+                .take(4)
+                .map((change) {
               final isBuy = change.isBuy;
               final color = isBuy ? AppTheme.success : AppTheme.error;
               return Padding(
@@ -556,12 +566,14 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                     Expanded(
                       child: Text(
                         change.fundName,
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 14),
                       ),
                     ),
                     Text(
                       '${isBuy ? '+' : ''}${Formatters.formatCurrency(change.change)}',
-                      style: TextStyle(color: color, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(color: color, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -585,7 +597,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: Colors.white54, size: 16),
+                  const Icon(Icons.info_outline,
+                      color: Colors.white54, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -628,7 +641,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
     );
   }
 
-  void _showUndoConfirmDialog(BuildContext context, PortfolioProvider provider) {
+  void _showUndoConfirmDialog(
+      BuildContext context, PortfolioProvider provider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -668,20 +682,20 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Row(
-                 children: [
-                   Icon(Icons.warning_amber, color: AppTheme.warning, size: 16),
-                   SizedBox(width: 8),
-                   Expanded(
-                     child: Text(
-                       '此操作只能执行一次，请确认是否继续',
-                       style: TextStyle(
-                         color: AppTheme.warning,
-                         fontSize: 13,
-                       ),
-                     ),
-                   ),
-                 ],
-               ),
+                children: [
+                  Icon(Icons.warning_amber, color: AppTheme.warning, size: 16),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '此操作只能执行一次，请确认是否继续',
+                      style: TextStyle(
+                        color: AppTheme.warning,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -743,7 +757,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
     );
   }
 
-  Widget _buildStatusCard(bool needsRebalancing, PortfolioProvider provider, BuildContext context) {
+  Widget _buildStatusCard(
+      bool needsRebalancing, PortfolioProvider provider, BuildContext context) {
     final statusColor = needsRebalancing ? AppTheme.warning : AppTheme.success;
     final checkResult = provider.checkCanRebalance();
     final canRebalance = checkResult?.canExecute ?? true;
@@ -851,7 +866,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
     );
   }
 
-  Widget _buildCannotRebalanceCard(RebalanceCheckResult checkResult, PortfolioProvider provider, BuildContext context) {
+  Widget _buildCannotRebalanceCard(RebalanceCheckResult checkResult,
+      PortfolioProvider provider, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -908,7 +924,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                   onPressed: () => Navigator.pop(context),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                    side:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -923,7 +940,7 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    provider.triggerShowAddFundDialog();
                     provider.selectTab(0);
                   },
                   borderRadius: BorderRadius.circular(14),
@@ -961,7 +978,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
     );
   }
 
-  Widget _buildCurrentAllocation(BuildContext context, PortfolioProvider provider) {
+  Widget _buildCurrentAllocation(
+      BuildContext context, PortfolioProvider provider) {
     final percentages = provider.categoryPercentages;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -984,7 +1002,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.pie_chart, color: AppTheme.accentGold, size: 22),
+                child: const Icon(Icons.pie_chart,
+                    color: AppTheme.accentGold, size: 22),
               ),
               const SizedBox(width: 12),
               const Text(
@@ -1001,7 +1020,7 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
           ...PortfolioCategory.values.map((category) {
             final percentage = percentages[category] ?? 0;
             final color = AppTheme.getCategoryColor(category);
-             final deviation = percentage - 0.25;
+            final deviation = percentage - 0.25;
             final deviationColor = deviation > 0
                 ? AppTheme.error
                 : deviation < 0
@@ -1039,7 +1058,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: color.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
@@ -1076,7 +1096,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                       ),
                       Container(
                         height: 10,
-                        width: (screenWidth - 88).clamp(0, double.infinity) * percentage.clamp(0.0, 1.0),
+                        width: (screenWidth - 88).clamp(0, double.infinity) *
+                            percentage.clamp(0.0, 1.0),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [color, color.withValues(alpha: 0.7)],
@@ -1122,7 +1143,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.lightbulb_outline, color: AppTheme.success, size: 22),
+                child: const Icon(Icons.lightbulb_outline,
+                    color: AppTheme.success, size: 22),
               ),
               const SizedBox(width: 12),
               const Text(
@@ -1155,7 +1177,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
               ),
               child: Column(
                 children: [
-                  const Icon(Icons.check_circle, color: AppTheme.success, size: 48),
+                  const Icon(Icons.check_circle,
+                      color: AppTheme.success, size: 48),
                   const SizedBox(height: 12),
                   const Text(
                     '无需进行再平衡操作',
@@ -1237,7 +1260,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: actionColor.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
