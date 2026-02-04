@@ -883,15 +883,18 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
           const SizedBox(height: 24),
           ...PortfolioCategory.values.map((category) {
             final percentage = percentages[category] ?? 0;
-            final deviation = percentage - 0.25;
             final color = AppTheme.getCategoryColor(category);
+            final deviation = percentage - 0.25;
             final deviationColor = deviation > 0
                 ? AppTheme.error
                 : deviation < 0
                     ? color
                     : AppTheme.success;
-            final deviationText =
-                deviation >= 0 ? '+${(deviation * 100).toStringAsFixed(1)}%' : '${(deviation * 100).toStringAsFixed(1)}%';
+            final deviationText = deviation == 0
+                ? '平衡'
+                : deviation >= 0
+                    ? '+${(deviation * 100).toStringAsFixed(1)}%'
+                    : '${(deviation * 100).toStringAsFixed(1)}%';
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),

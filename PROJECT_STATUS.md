@@ -745,3 +745,33 @@ flutter analyze: ✅ 0 errors (4 个 info 警告)
 ### 方案文档
 
 `docs/plans/fix-fund-list-edit-mode-state-20260204.md`
+
+---
+
+## M28：修复总金额为0时显示错误偏离度 2026-02-04
+
+### 问题描述
+
+当总投资金额（totalAmount）为0时，每个类别都显示 -25% 偏离度，但实际上投资组合为空，应被视为"平衡"状态。
+
+### 问题根源
+
+`calculateDeviations()` 方法计算逻辑：0% - 25% = -25%
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/services/portfolio_calculator.dart` | 修改 `calculateDeviations()`，totalAmount 为 0 时返回 0 偏离度 |
+| `lib/screens/statistics_screen.dart` | 修改偏离度显示，0% 时显示"平衡" |
+| `lib/screens/rebalance_screen.dart` | 修改偏离度显示，0% 时显示"平衡" |
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (4 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/fix-zero-total-amount-deviation-display-20260204.md`

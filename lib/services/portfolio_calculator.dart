@@ -28,6 +28,14 @@ class PortfolioCalculator {
   Map<PortfolioCategory, double> calculateDeviations() {
     final percentages = calculateCategoryPercentages();
     final deviations = <PortfolioCategory, double>{};
+    final total = portfolio.totalAmount;
+
+    if (total == 0) {
+      for (final category in PortfolioCategory.values) {
+        deviations[category] = 0;
+      }
+      return deviations;
+    }
 
     for (final category in PortfolioCategory.values) {
       final target = TargetAllocation.getTarget(category);

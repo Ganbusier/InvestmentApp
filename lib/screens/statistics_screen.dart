@@ -299,14 +299,17 @@ class StatisticsScreen extends StatelessWidget {
             final amount = provider.portfolio?.getAmountByCategory(category) ?? 0;
             final percentage = percentages[category] ?? 0;
             final color = AppTheme.getCategoryColor(category);
-            final deviation = percentage - 0.25;
+             final deviation = percentage - 0.25;
             final deviationColor = deviation > 0
                 ? AppTheme.error
                 : deviation < 0
                     ? color
                     : AppTheme.success;
-            final deviationText =
-                deviation >= 0 ? '+${(deviation * 100).toStringAsFixed(1)}%' : '${(deviation * 100).toStringAsFixed(1)}%';
+            final deviationText = deviation == 0
+                ? '平衡'
+                : deviation >= 0
+                    ? '+${(deviation * 100).toStringAsFixed(1)}%'
+                    : '${(deviation * 100).toStringAsFixed(1)}%';
 
             return AnimatedContainer(
               duration: Duration(milliseconds: 300 + category.index * 50),
