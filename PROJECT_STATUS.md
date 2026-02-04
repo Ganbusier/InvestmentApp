@@ -590,3 +590,97 @@ flutter analyze: ✅ 0 errors
 ### 方案文档
 
 `docs/plans/fix-fundsnapshot-adapter-missing.md`
+
+---
+
+## 移除删除 Snackbar，改用历史记录统一撤销 2026-02-04
+
+### 问题描述
+
+删除基金后弹出的 Snackbar 不会自动消失，用户体验不佳。
+
+### 修改内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/screens/home_screen.dart` | 移除删除 Snackbar |
+| `lib/screens/fund_list_screen.dart` | 移除 `_showUndoSnackBar` 方法和调用 |
+| `lib/screens/fund_list_screen.dart` | 历史记录图标始终显示（移除 `canUndo` 条件） |
+| `lib/screens/fund_list_screen.dart` | 添加空状态检查（暂无删除记录） |
+
+### 效果
+
+- 删除基金后不再弹出 Snackbar
+- 基金列表页面 AppBar 右侧历史记录图标始终可见
+- 点击图标可执行撤销操作或查看空状态
+
+### Git 提交
+
+```
+7a46fdb refactor: 移除删除Snackbar，改用历史记录统一撤销
+```
+
+---
+
+## 首页类别卡片添加基金编辑功能 2026-02-04
+
+### 功能描述
+
+在首页类别卡片展开后，点击基金项可编辑基金信息（金额等）。
+
+### 修改内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/widgets/category_card.dart` | 添加 `onFundTap` 回调参数，基金项添加 InkWell 点击区域 |
+| `lib/screens/home_screen.dart` | 添加 `_showEditFundDialog` 方法，传递 `onFundTap` 参数 |
+
+### 效果
+
+- 首页类别展开后显示的基金列表项可点击
+- 点击后弹出编辑弹窗，可修改金额等信息
+- 编辑保存后自动更新首页数据
+- 删除功能保持不受影响
+
+### Git 提交
+
+```
+33b6458 feat: 首页类别卡片添加基金编辑功能
+```
+
+### 方案文档
+
+`docs/plans/home-screen-fund-edit-20260204.md`
+
+---
+
+## 当前项目状态
+
+| 阶段 | 状态 | 说明 |
+|------|------|------|
+| M1-M16 | ✅ 已完成 | 基础功能和UI |
+| M17-M20 | ✅ 已完成 | 再平衡、跳转、清理 |
+| M21 | ✅ 已完成 | 基金删除撤销功能 |
+| M22 | ✅ 已完成 | 删除确认对话框修复 |
+| M23 | ✅ 已完成 | FundSnapshot 适配器修复 |
+| M24 | ✅ 已完成 | 移除删除 Snackbar |
+| M25 | ✅ 已完成 | 首页基金编辑功能 |
+
+### 技术状态
+
+| 指标 | 状态 |
+|------|------|
+| flutter analyze | ✅ 0 errors (3 个 info 警告) |
+| Git status | ✅ 已推送到远程 |
+
+### 核心功能状态
+
+| 功能 | 状态 | 描述 |
+|------|------|------|
+| 基金录入 | ✅ 完整 | 添加、编辑、删除 |
+| 统计可视化 | ✅ 完整 | 饼图、类别分布 |
+| 监控提醒 | ✅ 完整 | 偏离预警 |
+| 再平衡功能 | ✅ 完整 | 预览、执行、撤销 |
+| 删除撤销 | ✅ 完整 | 最多 10 条历史，多次撤销 |
+| 首页基金编辑 | ✅ 完整 | 展开后点击编辑 |
+| 项目规则 | ✅ 已建立 | superpowers 规范、方案保存、状态记录 |
