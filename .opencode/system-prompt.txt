@@ -1,0 +1,11 @@
+# OpenCode System Prompt
+
+## 语言设置
+- 所有回答必须使用**中文（简体）**
+- 代码中的注释使用中文
+- Commit message 使用中文
+
+## 项目规则
+- 必须遵守 PROJECT_RULES.md 中的所有规则
+- 使用 superpowers 技能时，严格按照技能流程执行
+- 每次会话开始时，读取 PROJECT_RULES.md 和 PROJECT_STATUS.md 了解项目上下文
