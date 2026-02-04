@@ -140,28 +140,35 @@ class PortfolioProvider with ChangeNotifier {
 
   RebalanceCheckResult? checkCanRebalance() {
     if (_portfolio == null || _portfolio!.funds.isEmpty) {
-      return const RebalanceCheckResult(
+      return RebalanceCheckResult(
         canRebalance: false,
         reason: RebalanceCheckReason.emptyCategoryNeedsBuy,
+        emptyCategories: PortfolioCategory.values.toList(),
       );
     }
 
+    final emptyCategories = <PortfolioCategory>[];
     for (final category in PortfolioCategory.values) {
       final currentAmount = _portfolio!.getAmountByCategory(category);
       final targetAmount = totalAmount * TargetAllocation.getTarget(category);
 
       if (currentAmount == 0 && targetAmount > 0) {
-        return RebalanceCheckResult(
-          canRebalance: false,
-          reason: RebalanceCheckReason.emptyCategoryNeedsBuy,
-          category: category,
-        );
+        emptyCategories.add(category);
       }
     }
 
-    return const RebalanceCheckResult(
+    if (emptyCategories.isNotEmpty) {
+      return RebalanceCheckResult(
+        canRebalance: false,
+        reason: RebalanceCheckReason.emptyCategoryNeedsBuy,
+        emptyCategories: emptyCategories,
+      );
+    }
+
+    return RebalanceCheckResult(
       canRebalance: true,
       reason: RebalanceCheckReason.canRebalance,
+      emptyCategories: [],
     );
   }
 

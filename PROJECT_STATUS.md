@@ -952,3 +952,31 @@ flutter analyze: ✅ 0 errors (5 个 info 警告)
 ### 方案文档
 
 `docs/plans/add-rebalance-empty-category-check-20260204.md`
+
+---
+
+## M32 补充：显示所有空类别 2026-02-04
+
+### 问题描述
+
+当多个类别为空时，原实现只显示第一个空类别（如"债券类别为空"），但用户应该知道所有空类别的情况。
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/models/rebalance_check_result.dart` | 支持多个空类别，返回列表 |
+| `lib/providers/portfolio_provider.dart` | 返回所有空类别列表 |
+
+### 预期效果
+
+**空类别提示：**
+```
+无法执行再平衡：债券、现金、黄金类别为空，无法接收资金转移。请先在这些类别中添加基金。
+```
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (6 个 info 警告)
+```
