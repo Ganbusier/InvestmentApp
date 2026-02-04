@@ -160,7 +160,11 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     final color = AppTheme.getCategoryColor(widget.category);
     final deviation = widget.currentPercentage - widget.targetPercentage;
-    final deviationText = deviation >= 0 ? '+${(deviation * 100).toStringAsFixed(1)}%' : '${(deviation * 100).toStringAsFixed(1)}%';
+    final deviationText = widget.currentPercentage == 0
+        ? '平衡'
+        : deviation >= 0
+            ? '+${(deviation * 100).toStringAsFixed(1)}%'
+            : '${(deviation * 100).toStringAsFixed(1)}%';
     final deviationColor = deviation > 0 ? AppTheme.error : deviation < 0 ? color.withValues(alpha: 0.8) : AppTheme.success;
 
     return Container(

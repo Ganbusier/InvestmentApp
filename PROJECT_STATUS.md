@@ -775,3 +775,27 @@ flutter analyze: ✅ 0 errors (4 个 info 警告)
 ### 方案文档
 
 `docs/plans/fix-zero-total-amount-deviation-display-20260204.md`
+
+---
+
+## M28 补充：修复首页类别卡片偏离度显示 2026-02-04
+
+### 问题描述
+
+在 M28 修复中遗漏了 `category_card.dart` 组件，投资组合为空时仍显示 -25% 偏离度。
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/widgets/category_card.dart` | 修复偏离度显示，0% 时显示"平衡" |
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (4 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/fix-category-card-deviation-display-20260204.md`
