@@ -30,7 +30,7 @@ class Portfolio {
 
   double getPercentageByCategory(PortfolioCategory category) {
     final categoryAmount = getAmountByCategory(category);
-    if (totalAmount == 0) return 0;
+    if (totalAmount == 0) return 0.25;
     return categoryAmount / totalAmount;
   }
 

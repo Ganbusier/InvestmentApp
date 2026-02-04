@@ -879,3 +879,31 @@ flutter analyze: ✅ 0 errors (4 个 info 警告)
 ### 方案文档
 
 `docs/plans/fix-zero-total-amount-percentage-display-20260204.md`
+
+---
+
+## M31：修复首页类别卡片百分比显示错误问题 2026-02-04
+
+### 问题描述
+
+总金额为0时，首页类别卡片显示占比0%，偏离25%，但应该显示占比25%，偏离0%。
+
+### 问题根源
+
+首页类别卡片使用 `Portfolio.getPercentageByCategory()` 获取百分比，该方法在 `totalAmount == 0` 时返回 0。
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/models/portfolio.dart` | `getPercentageByCategory()` 返回 0.25 |
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (4 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/fix-home-category-card-percentage-display-20260204.md`
