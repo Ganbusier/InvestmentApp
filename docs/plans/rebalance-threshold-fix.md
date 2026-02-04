@@ -73,6 +73,40 @@ for (final fund in _portfolio!.funds) {
 3. 执行再平衡时只执行超过阈值的调整
 4. 所有现有测试通过
 
+## 额外修复：输入验证问题
+
+### 问题
+在阈值输入框中输入 >= 100 的值时（如 441%），当前代码不会自动重置为默认值 10%。
+
+当前逻辑 (`rebalance_screen.dart:140-145`):
+```dart
+if (parsed != null && parsed > 0 && parsed < 100) {
+  provider.setRebalanceThreshold(parsed / 100);
+}
+```
+
+问题：
+- 输入 "44" 时，`44 > 0 && 44 < 100` 为 true，阈值被设置为 0.44
+- 继续输入 "441"，`441 < 100` 为 false，不会更新
+- 但 0.44 已被设置，不会自动重置回 10%
+
+### 修复方案
+修改 `onChanged` 回调，当输入 >= 100 时自动重置为 10%：
+
+```dart
+onChanged: (value) {
+  final parsed = double.tryParse(value);
+  if (parsed != null) {
+    if (parsed >= 100) {
+      controller.text = '10.00';
+      provider.setRebalanceThreshold(0.10);
+    } else if (parsed > 0 && parsed < 100) {
+      provider.setRebalanceThreshold(parsed / 100);
+    }
+  }
+},
+```
+
 ## 额外修复：除以零问题
 
 ### 问题

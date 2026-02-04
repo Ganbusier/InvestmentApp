@@ -1012,3 +1012,128 @@ flutter analyze: ✅ 0 errors (6 个 info 警告)
 ```
 flutter analyze: ✅ 0 errors (6 个 info 警告)
 ```
+
+---
+
+## M33：修复再平衡阈值功能 2026-02-04
+
+### 问题描述
+
+再平衡阈值功能不能正常工作：
+1. `generateRebalanceActions()` 使用硬编码 `adjustment.abs() > 1`，未使用阈值
+2. `previewRebalance()` 未使用阈值，始终显示所有变化
+3. `executeRebalance()` 未使用阈值，始终执行所有调整
+4. 输入验证不完善，输入 >= 100 时无明确提示
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/services/rebalance_calculator.dart` | `generateRebalanceActions()` 使用阈值过滤 |
+| `lib/providers/portfolio_provider.dart` | `previewRebalance()` 和 `executeRebalance()` 使用阈值 |
+| `lib/screens/rebalance_screen.dart` | 移除内联 TextField，改为可点击卡片 + ModalBottomSheet |
+| `test/services/rebalance_calculator_test.dart` | 更新测试用例 |
+
+### 额外修复
+
+1. **输入验证**：输入 >= 100 时自动重置为 10%
+2. **除以零保护**：totalAmount == 0 时避免除零错误
+
+### 验证结果
+
+```
+flutter test: ✅ 8 passed
+flutter analyze: ✅ 0 errors
+```
+
+### Git 提交
+
+```
+4abc047 feat: 修复再平衡阈值功能，添加阈值设置UI和持久化
+```
+
+### 方案文档
+
+`docs/plans/rebalance-threshold-fix.md`
+
+---
+
+## M34：再平衡阈值设置交互优化 2026-02-04
+
+### 问题描述
+
+原始输入框直接显示在内联卡片中，用户体验不佳：
+1. 输入框直接显示，用户可能误操作
+2. 输入 >= 100 自动重置，无明确提示
+3. 无清晰的确认/取消流程
+
+### 解决方案
+
+使用 ModalBottomSheet 弹出独立编辑界面：
+1. 点击阈值卡片弹出底部面板
+2. 自动弹出键盘
+3. 实时验证，错误提示明确
+4. 确认按钮状态控制
+
+### 验证逻辑
+
+| 输入值 | 按钮状态 | 错误提示 |
+|-------|---------|---------|
+| 空值 | 禁用 | 请输入有效的数字 |
+| <= 0 | 禁用 | 请输入有效的数字 |
+| 0 < value < 100 | 启用 | 无 |
+| >= 100 | 禁用 | 阈值不能大于或等于100% |
+
+### 修改文件
+
+| 文件 | 修改 |
+|------|------|
+| `lib/screens/rebalance_screen.dart` | `_buildThresholdSettingCard()` 改为可点击卡片 |
+| `lib/screens/rebalance_screen.dart` | 新增 `_showThresholdBottomSheet()` 方法 |
+| `lib/screens/rebalance_screen.dart` | 新增 `_ThresholdEditSheet` 组件 |
+
+### 验证结果
+
+```
+flutter test: ✅ 8 passed
+flutter analyze: ✅ 0 errors
+```
+
+### 方案文档
+
+`docs/plans/rebalance-threshold-modal-sheet.md`
+
+---
+
+## 当前项目状态
+
+| 阶段 | 状态 | 说明 |
+|------|------|------|
+| M1-M16 | ✅ 已完成 | 基础功能和UI |
+| M17-M20 | ✅ 已完成 | 再平衡、跳转、清理 |
+| M21-M25 | ✅ 已完成 | 撤销、编辑功能 |
+| M26-M31 | ✅ 已完成 | UI修复和优化 |
+| M32 | ✅ 已完成 | 空类别检查 |
+| M33 | ✅ 已完成 | 再平衡阈值功能修复 |
+| M34 | ✅ 已完成 | 阈值设置交互优化 |
+
+### 技术状态
+
+| 指标 | 状态 |
+|------|------|
+| flutter analyze | ✅ 0 errors |
+| flutter test | ✅ 8 passed |
+| Git status | ✅ 已推送到远程 |
+
+### 核心功能状态
+
+| 功能 | 状态 | 描述 |
+|------|------|------|
+| 基金录入 | ✅ 完整 | 添加、编辑、删除 |
+| 统计可视化 | ✅ 完整 | 饼图、类别分布 |
+| 监控提醒 | ✅ 完整 | 偏离预警 |
+| 再平衡功能 | ✅ 完整 | 预览、执行、撤销 |
+| 删除撤销 | ✅ 完整 | 最多 10 条历史，多次撤销 |
+| 首页基金编辑 | ✅ 完整 | 展开后点击编辑 |
+| 阈值设置 | ✅ 完整 | ModalBottomSheet 交互优化 |
+| 项目规则 | ✅ 已建立 | superpowers 规范、方案保存、状态记录 |

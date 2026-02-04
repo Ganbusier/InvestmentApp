@@ -87,75 +87,43 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
 
   Widget _buildThresholdSettingCard(PortfolioProvider provider) {
     final threshold = provider.rebalanceThreshold;
-    final controller = TextEditingController(
-      text: (threshold * 100).toStringAsFixed(2),
-    );
 
-    return Container(
-      decoration: AppTheme.getCardDecoration(),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.tune, color: AppTheme.accentGold),
-              const SizedBox(width: 8),
-              const Text(
-                '再平衡阈值',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '当类别偏离目标超过此阈值时触发再平衡建议',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.white.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    suffix: const Text('%', style: TextStyle(color: Colors.white70)),
-                    filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.05),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+    return InkWell(
+      onTap: () => _showThresholdBottomSheet(context, provider),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: AppTheme.getCardDecoration(),
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Icon(Icons.tune, color: AppTheme.accentGold),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '再平衡阈值',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
-                  onChanged: (value) {
-                    final parsed = double.tryParse(value);
-                    if (parsed != null && parsed > 0 && parsed < 100) {
-                      provider.setRebalanceThreshold(parsed / 100);
-                    }
-                  },
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${(threshold * 100).toStringAsFixed(1)}%',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              TextButton(
-                onPressed: () {
-                  controller.text = '10.00';
-                  provider.setRebalanceThreshold(0.10);
-                },
-                child: const Text('重置', style: TextStyle(color: AppTheme.accentGold)),
-              ),
-            ],
-          ),
-        ],
+            ),
+            Icon(Icons.chevron_right, color: Colors.white.withValues(alpha: 0.4)),
+          ],
+        ),
       ),
     );
   }
@@ -1356,6 +1324,212 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                 ),
               );
             }),
+        ],
+      ),
+    );
+  }
+
+  void _showThresholdBottomSheet(BuildContext context, PortfolioProvider provider) {
+    final controller = TextEditingController(
+      text: (provider.rebalanceThreshold * 100).toStringAsFixed(2),
+    );
+    final focusNode = FocusNode();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF1A2D47), Color(0xFF0D1B2A)],
+          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border(
+            top: BorderSide(
+              color: AppTheme.accentGold.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: _ThresholdEditSheet(
+          controller: controller,
+          focusNode: focusNode,
+          currentThreshold: provider.rebalanceThreshold,
+          onConfirm: (value) {
+            provider.setRebalanceThreshold(value / 100);
+            Navigator.pop(context);
+          },
+          onCancel: () => Navigator.pop(context),
+        ),
+      ),
+    );
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      focusNode.requestFocus();
+    });
+  }
+}
+
+class _ThresholdEditSheet extends StatefulWidget {
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final double currentThreshold;
+  final void Function(double value) onConfirm;
+  final VoidCallback onCancel;
+
+  const _ThresholdEditSheet({
+    required this.controller,
+    required this.focusNode,
+    required this.currentThreshold,
+    required this.onConfirm,
+    required this.onCancel,
+  });
+
+  @override
+  State<_ThresholdEditSheet> createState() => _ThresholdEditSheetState();
+}
+
+class _ThresholdEditSheetState extends State<_ThresholdEditSheet> {
+  String? _errorText;
+
+  void _validateInput(String value) {
+    final parsed = double.tryParse(value);
+
+    if (parsed == null || parsed <= 0) {
+      setState(() {
+        _errorText = '请输入有效的数字';
+      });
+    } else if (parsed >= 100) {
+      setState(() {
+        _errorText = '阈值不能大于或等于100%';
+      });
+    } else {
+      setState(() {
+        _errorText = null;
+      });
+    }
+  }
+
+  bool get _isValid {
+    final parsed = double.tryParse(widget.controller.text);
+    return parsed != null && parsed > 0 && parsed < 100;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                onPressed: widget.onCancel,
+                icon: const Icon(Icons.close, color: Colors.white),
+              ),
+              const Expanded(
+                child: Text(
+                  '设置再平衡阈值',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(width: 48),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            '当某个类别偏离目标超过此阈值时，系统将建议进行再平衡操作',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white70,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: widget.controller,
+            focusNode: widget.focusNode,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            style: const TextStyle(color: Colors.white, fontSize: 24),
+            decoration: InputDecoration(
+              suffix: const Text('%', style: TextStyle(color: Colors.white70, fontSize: 18)),
+              filled: true,
+              fillColor: Colors.white.withValues(alpha: 0.05),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: _errorText != null ? AppTheme.error : Colors.white.withValues(alpha: 0.2),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: _errorText != null ? AppTheme.error : AppTheme.accentGold,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+            onChanged: _validateInput,
+          ),
+          if (_errorText != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.error_outline, color: AppTheme.error, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  _errorText!,
+                  style: TextStyle(color: AppTheme.error, fontSize: 13),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '当前阈值',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+              ),
+              Text(
+                '${(widget.currentThreshold * 100).toStringAsFixed(1)}%',
+                style: const TextStyle(
+                  color: AppTheme.accentGold,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isValid ? () => widget.onConfirm(double.parse(widget.controller.text)) : null,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: _isValid ? AppTheme.accentGold : Colors.white.withValues(alpha: 0.1),
+                foregroundColor: _isValid ? AppTheme.primaryDark : Colors.white.withValues(alpha: 0.3),
+              ),
+              child: const Text(
+                '确认',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
         ],
       ),
     );
