@@ -684,3 +684,40 @@ flutter analyze: ✅ 0 errors
 | 删除撤销 | ✅ 完整 | 最多 10 条历史，多次撤销 |
 | 首页基金编辑 | ✅ 完整 | 展开后点击编辑 |
 | 项目规则 | ✅ 已建立 | superpowers 规范、方案保存、状态记录 |
+
+---
+
+## M26：移除 MainScreen 重复标题 2026-02-04
+
+### 问题描述
+
+1. MainScreen 在屏幕左上角显示每个页面的图标和标题
+2. 每个子页面自带 AppBar，显示相同或类似的标题
+3. 造成标题重复显示
+
+### 修改内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/screens/main_screen.dart` | 移除 AppBar、移除 `_titles` 和 `_getCurrentIcon()` |
+| `lib/screens/home_screen.dart` | 添加 AppBar（金色图标 + "财富管理"） |
+| `lib/screens/fund_list_screen.dart` | 更新 AppBar 样式（金色图标 + 动态标题） |
+| `lib/screens/statistics_screen.dart` | 更新 AppBar 样式（金色图标 + "投资统计"） |
+| `lib/screens/rebalance_screen.dart` | 更新 AppBar 样式（金色图标 + "再平衡"） |
+
+### AppBar 样式
+
+每个页面使用统一的标题样式：
+- 金色渐变图标容器
+- 22px 粗体标题文字
+- 图标与文字间距 12px
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (4 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/remove-main-screen-duplicate-titles-20260204.md`

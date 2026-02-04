@@ -247,6 +247,33 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        elevation: 0,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.accentGold, AppTheme.accentGold.withValues(alpha: 0.8)],
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.trending_up, color: AppTheme.primaryDark, size: 20),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              '财富管理',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ],
+        ),
+        actions: [],
+      ),
       body: Consumer<PortfolioProvider>(
         builder: (context, provider, child) {
           if (!provider.isLoaded) {

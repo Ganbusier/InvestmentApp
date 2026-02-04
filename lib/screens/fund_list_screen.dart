@@ -314,13 +314,28 @@ class _FundListScreenState extends State<FundListScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          _isEditMode ? '选择基金' : '我的基金',
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.accentGold, AppTheme.accentGold.withValues(alpha: 0.8)],
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.account_balance_wallet, color: AppTheme.primaryDark, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              _isEditMode ? '选择基金' : '我的基金',
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ],
         ),
         actions: [
           if (!_isEditMode)

@@ -22,15 +22,25 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Row(
+        title: Row(
           children: [
-            SizedBox(width: 8),
-            Text(
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.accentGold, AppTheme.accentGold.withValues(alpha: 0.8)],
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.swap_horiz, color: AppTheme.primaryDark, size: 20),
+            ),
+            const SizedBox(width: 12),
+            const Text(
               '再平衡',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                letterSpacing: -0.5,
               ),
             ),
           ],

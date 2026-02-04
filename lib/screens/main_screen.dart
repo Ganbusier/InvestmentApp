@@ -24,13 +24,6 @@ class _MainScreenState extends State<MainScreen> {
         const RebalanceScreen(),
       ];
 
-  final List<String> _titles = [
-    '财富管理',
-    '我的基金',
-    '投资统计',
-    '再平衡',
-  ];
-
   void _onTabSelected(int index) {
     final provider = Provider.of<PortfolioProvider>(context, listen: false);
     provider.clearSelectedTab();
@@ -63,33 +56,6 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildBody() {
     return Scaffold(
       backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        elevation: 0,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppTheme.accentGold, AppTheme.accentGold.withValues(alpha: 0.8)],
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(_getCurrentIcon(), color: AppTheme.primaryDark, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              _titles[_currentIndex],
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ],
-        ),
-        actions: const [],
-      ),
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
@@ -151,19 +117,5 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-
-  IconData _getCurrentIcon() {
-    switch (_currentIndex) {
-      case 0:
-        return Icons.trending_up;
-      case 1:
-        return Icons.account_balance_wallet;
-      case 2:
-        return Icons.insights;
-      case 3:
-        return Icons.swap_horiz;
-      default:
-        return Icons.trending_up;
-    }
-  }
 }
+
