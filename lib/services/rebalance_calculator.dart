@@ -6,9 +6,12 @@ import 'package:investment_app/services/portfolio_calculator.dart';
 class RebalanceCalculator {
   final Portfolio portfolio;
   final double totalAmount;
+  final double threshold;
 
-  RebalanceCalculator({required this.portfolio})
-      : totalAmount = portfolio.totalAmount;
+  RebalanceCalculator({
+    required this.portfolio,
+    this.threshold = 0.10,
+  }) : totalAmount = portfolio.totalAmount;
 
   Map<PortfolioCategory, double> calculateTargetAmounts() {
     final Map<PortfolioCategory, double> targets = {};
@@ -35,12 +38,20 @@ class RebalanceCalculator {
   }
 
   List<RebalanceAction> generateRebalanceActions() {
+    if (totalAmount == 0) {
+      return [];
+    }
+
     final adjustments = calculateAdjustments();
     final actions = <RebalanceAction>[];
 
     for (final category in PortfolioCategory.values) {
       final adjustment = adjustments[category]!;
-      if (adjustment.abs() > 1) {
+      final currentPercentage = portfolio.getAmountByCategory(category) / totalAmount;
+      final targetPercentage = TargetAllocation.getTarget(category);
+      final deviation = (currentPercentage - targetPercentage).abs();
+
+      if (deviation > threshold) {
         actions.add(RebalanceAction(
           category: category,
           amount: adjustment.abs(),
@@ -54,7 +65,7 @@ class RebalanceCalculator {
 
   bool get needsRebalancing {
     final deviations = PortfolioCalculator(portfolio: portfolio).calculateDeviations();
-    return deviations.values.any((dev) => dev.abs() > 0.05);
+    return deviations.values.any((dev) => dev.abs() > threshold);
   }
 }
 

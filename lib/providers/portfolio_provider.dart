@@ -55,10 +55,26 @@ class PortfolioProvider with ChangeNotifier {
     return _portfolio?.getFundsByCategory(category) ?? [];
   }
 
+  double get rebalanceThreshold {
+    return HiveService.getRebalanceThreshold();
+  }
+
+  Future<void> setRebalanceThreshold(double threshold) async {
+    await HiveService.saveRebalanceThreshold(threshold);
+    _rebalanceCalculator = RebalanceCalculator(
+      portfolio: _portfolio!,
+      threshold: threshold,
+    );
+    notifyListeners();
+  }
+
   Future<void> loadPortfolio() async {
     _portfolio = HiveService.getPortfolio();
     _calculator = PortfolioCalculator(portfolio: _portfolio!);
-    _rebalanceCalculator = RebalanceCalculator(portfolio: _portfolio!);
+    _rebalanceCalculator = RebalanceCalculator(
+      portfolio: _portfolio!,
+      threshold: rebalanceThreshold,
+    );
     _rebalanceSnapshot = HiveService.getRebalanceSnapshot();
     await loadDeletionHistory();
     notifyListeners();
@@ -189,12 +205,24 @@ class PortfolioProvider with ChangeNotifier {
     }
 
     final totalAmount = _portfolio!.totalAmount;
+    if (totalAmount == 0) {
+      return RebalancePreview(
+        categoryChanges: {},
+        fundChanges: [],
+        totalBuy: 0,
+        totalSell: 0,
+      );
+    }
+
     final targetAmounts = <PortfolioCategory, double>{};
     final categoryTotals = <PortfolioCategory, double>{};
+    final categoryDeviations = <PortfolioCategory, double>{};
 
     for (final category in PortfolioCategory.values) {
       targetAmounts[category] = totalAmount * 0.25;
       categoryTotals[category] = _portfolio!.getAmountByCategory(category);
+      final currentPercentage = categoryTotals[category]! / totalAmount;
+      categoryDeviations[category] = (currentPercentage - 0.25).abs();
     }
 
     final categoryChanges = <PortfolioCategory, double>{};
@@ -203,6 +231,10 @@ class PortfolioProvider with ChangeNotifier {
     double totalSell = 0;
 
     for (final fund in _portfolio!.funds) {
+      if (categoryDeviations[fund.category]! < rebalanceThreshold) {
+        continue;
+      }
+
       final target = targetAmounts[fund.category]!;
       final categoryTotal = categoryTotals[fund.category]!;
       final categoryAdjustment = target - categoryTotal;
@@ -230,7 +262,9 @@ class PortfolioProvider with ChangeNotifier {
     }
 
     for (final category in PortfolioCategory.values) {
-      categoryChanges[category] = targetAmounts[category]! - categoryTotals[category]!;
+      if (categoryDeviations[category]! >= rebalanceThreshold) {
+        categoryChanges[category] = targetAmounts[category]! - categoryTotals[category]!;
+      }
     }
 
     return RebalancePreview(
@@ -245,22 +279,31 @@ class PortfolioProvider with ChangeNotifier {
     if (_portfolio == null || _portfolio!.funds.isEmpty) return false;
     if (_rebalanceSnapshot != null) return false;
 
+    final totalAmount = _portfolio!.totalAmount;
+    if (totalAmount == 0) return false;
+
     final snapshot = RebalanceSnapshot.fromFunds(
       _portfolio!.funds.map((f) => f.copyWith()).toList(),
       _portfolio!.totalAmount,
     );
     await HiveService.saveRebalanceSnapshot(snapshot);
 
-    final totalAmount = _portfolio!.totalAmount;
     final targetAmounts = <PortfolioCategory, double>{};
     final categoryTotals = <PortfolioCategory, double>{};
+    final categoryDeviations = <PortfolioCategory, double>{};
 
     for (final category in PortfolioCategory.values) {
       targetAmounts[category] = totalAmount * 0.25;
       categoryTotals[category] = _portfolio!.getAmountByCategory(category);
+      final currentPercentage = categoryTotals[category]! / totalAmount;
+      categoryDeviations[category] = (currentPercentage - 0.25).abs();
     }
 
     for (final fund in _portfolio!.funds) {
+      if (categoryDeviations[fund.category]! < rebalanceThreshold) {
+        continue;
+      }
+
       final target = targetAmounts[fund.category]!;
       final categoryTotal = categoryTotals[fund.category]!;
       final categoryAdjustment = target - categoryTotal;

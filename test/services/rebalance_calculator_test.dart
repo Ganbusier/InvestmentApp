@@ -56,15 +56,17 @@ void main() {
       final calculator = RebalanceCalculator(portfolio: portfolio);
       final actions = calculator.generateRebalanceActions();
 
-      expect(actions.length, 4);
+      // threshold = 0.10 (10%), only stock deviation 15% > 10%
+      expect(actions.length, 1);
       
       final stockAction = actions.firstWhere((a) => a.category == PortfolioCategory.stock);
       expect(stockAction.isBuy, isFalse);
       expect(stockAction.amount, closeTo(1500, 0.01));
 
-      final bondAction = actions.firstWhere((a) => a.category == PortfolioCategory.bond);
-      expect(bondAction.isBuy, isTrue);
-      expect(bondAction.amount, closeTo(500, 0.01));
+      // Verify no actions for other categories (deviations are 5% < 10% threshold)
+      expect(actions.where((a) => a.category == PortfolioCategory.bond), isEmpty);
+      expect(actions.where((a) => a.category == PortfolioCategory.cash), isEmpty);
+      expect(actions.where((a) => a.category == PortfolioCategory.gold), isEmpty);
     });
 
     test('Should detect needsRebalancing correctly', () {

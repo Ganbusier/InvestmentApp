@@ -113,4 +113,12 @@ class HiveService {
   static Future<void> clearAllDeletionHistory() async {
     await deletionHistoryBox.clear();
   }
+
+  static double getRebalanceThreshold() {
+    return settingsBox.get('rebalance_threshold', defaultValue: 0.10);
+  }
+
+  static Future<void> saveRebalanceThreshold(double threshold) async {
+    await settingsBox.put('rebalance_threshold', threshold);
+  }
 }

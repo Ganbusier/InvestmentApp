@@ -74,11 +74,88 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                 _buildCurrentAllocation(context, provider),
                 const SizedBox(height: 20),
                 _buildActionsCard(provider.getRebalanceActions()),
+                const SizedBox(height: 20),
+                _buildThresholdSettingCard(provider),
                 const SizedBox(height: 100),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildThresholdSettingCard(PortfolioProvider provider) {
+    final threshold = provider.rebalanceThreshold;
+    final controller = TextEditingController(
+      text: (threshold * 100).toStringAsFixed(2),
+    );
+
+    return Container(
+      decoration: AppTheme.getCardDecoration(),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.tune, color: AppTheme.accentGold),
+              const SizedBox(width: 8),
+              const Text(
+                '再平衡阈值',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '当类别偏离目标超过此阈值时触发再平衡建议',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.white.withValues(alpha: 0.6),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    suffix: const Text('%', style: TextStyle(color: Colors.white70)),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.05),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  ),
+                  onChanged: (value) {
+                    final parsed = double.tryParse(value);
+                    if (parsed != null && parsed > 0 && parsed < 100) {
+                      provider.setRebalanceThreshold(parsed / 100);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              TextButton(
+                onPressed: () {
+                  controller.text = '10.00';
+                  provider.setRebalanceThreshold(0.10);
+                },
+                child: const Text('重置', style: TextStyle(color: AppTheme.accentGold)),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
