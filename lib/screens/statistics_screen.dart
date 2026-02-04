@@ -305,7 +305,7 @@ class StatisticsScreen extends StatelessWidget {
                 : deviation < 0
                     ? color
                     : AppTheme.success;
-            final deviationText = deviation == 0
+            final deviationText = percentage == 0
                 ? '平衡'
                 : deviation >= 0
                     ? '+${(deviation * 100).toStringAsFixed(1)}%'

@@ -799,3 +799,38 @@ flutter analyze: ✅ 0 errors (4 个 info 警告)
 ### 方案文档
 
 `docs/plans/fix-category-card-deviation-display-20260204.md`
+
+---
+
+## M29：修复总金额为0时错误显示警告问题 2026-02-04
+
+### 问题描述
+
+当总投资金额（totalAmount）为0时：
+1. 首页显示"部分投资类别偏离目标配置，请关注"警告
+2. 但点击"查看详情"后，统计页面和再平衡页面显示"投资组合已平衡"
+
+### 问题根源
+
+1. `getCategoriesWithWarning()` 没有考虑 `totalAmount == 0` 的情况
+2. `isDeficient(0)` 返回 `true`（0 < 0.2），导致每个类别都被标记为"不足"
+3. 之前的修复中 `deviation == 0` 判断有误，应为 `percentage == 0`
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/services/portfolio_calculator.dart` | `getCategoriesWithWarning()` 增加 totalAmount == 0 判断 |
+| `lib/services/rebalance_calculator.dart` | `needsRebalancing()` 增加 totalAmount == 0 判断 |
+| `lib/screens/statistics_screen.dart` | `deviation == 0` 改为 `percentage == 0` |
+| `lib/screens/rebalance_screen.dart` | `deviation == 0` 改为 `percentage == 0` |
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (4 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/fix-zero-total-amount-warning-state-20260204.md`

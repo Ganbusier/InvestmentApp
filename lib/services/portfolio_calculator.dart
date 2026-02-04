@@ -46,6 +46,10 @@ class PortfolioCalculator {
   }
 
   Map<PortfolioCategory, bool> getCategoriesWithWarning() {
+    if (portfolio.totalAmount == 0) {
+      return {};
+    }
+
     final percentages = calculateCategoryPercentages();
     final warnings = <PortfolioCategory, bool>{};
 
