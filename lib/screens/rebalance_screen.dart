@@ -96,7 +96,7 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            Icon(Icons.tune, color: AppTheme.accentGold),
+            const Icon(Icons.tune, color: AppTheme.accentGold),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -1488,11 +1488,11 @@ class _ThresholdEditSheetState extends State<_ThresholdEditSheet> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.error_outline, color: AppTheme.error, size: 16),
+                const Icon(Icons.error_outline, color: AppTheme.error, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   _errorText!,
-                  style: TextStyle(color: AppTheme.error, fontSize: 13),
+                  style: const TextStyle(color: AppTheme.error, fontSize: 13),
                 ),
               ],
             ),

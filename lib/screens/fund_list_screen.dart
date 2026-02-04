@@ -260,7 +260,7 @@ class _FundListScreenState extends State<FundListScreen> {
                             ),
                           ),
                           subtitle: Text(
-                            '${history.deletedFunds.map((f) => f.name).join(', ')}',
+                            history.deletedFunds.map((f) => f.name).join(', '),
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.5),
                               fontSize: 12,

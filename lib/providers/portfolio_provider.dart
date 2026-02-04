@@ -187,7 +187,7 @@ class PortfolioProvider with ChangeNotifier {
       );
     }
 
-    return RebalanceCheckResult(
+    return const RebalanceCheckResult(
       canRebalance: true,
       reason: RebalanceCheckReason.canRebalance,
       emptyCategories: [],

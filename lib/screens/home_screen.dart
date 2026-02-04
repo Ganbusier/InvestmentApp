@@ -272,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        actions: [],
+        actions: const [],
       ),
       body: Consumer<PortfolioProvider>(
         builder: (context, provider, child) {
@@ -522,7 +522,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Text(
                               checkResult!.message,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppTheme.warning,
                                 fontSize: 13,
                                 height: 1.4,
