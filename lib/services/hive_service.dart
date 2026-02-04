@@ -2,7 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/models/fund_deletion_history.dart';
 import 'package:investment_app/models/portfolio.dart';
-import 'package:investment_app/models/rebalance_snapshot.dart' hide FundSnapshot, FundSnapshotAdapter;
+import 'package:investment_app/models/rebalance_snapshot.dart';
 
 class HiveService {
   static const String _fundsBoxName = 'funds';
@@ -23,6 +23,7 @@ class HiveService {
     Hive.registerAdapter(PortfolioAdapter());
     Hive.registerAdapter(PortfolioCategoryAdapter());
     Hive.registerAdapter(RebalanceSnapshotAdapter());
+    Hive.registerAdapter(FundSnapshotAdapter());
     Hive.registerAdapter(FundDeletionHistoryAdapter());
     Hive.registerAdapter(DeletedFundSnapshotAdapter());
 

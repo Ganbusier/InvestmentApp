@@ -550,3 +550,43 @@ _fund_list_screen.dart._confirmDelete
 | 再平衡功能 | ✅ 完整 | 预览、执行、撤销 |
 | 删除撤销 | ✅ 完整 | 最多 10 条历史，多次撤销 |
 | 项目规则 | ✅ 已建立 | superpowers 规范、方案保存、状态记录 |
+
+---
+
+## M23：修复 FundSnapshot Hive 适配器未注册问题 2026-02-04
+
+### 问题描述
+
+执行再平衡操作时，Dart 抛出错误：
+```
+DartError: HiveError: Cannot write, unknown type: FundSnapshot. Did you forget to register an adapter?
+```
+
+### 根因分析
+
+1. **导入隐藏问题**：`hive_service.dart:5` 使用 `hide` 关键字隐藏了 `FundSnapshotAdapter`
+2. **适配器注册缺失**：`init()` 方法中未注册 `FundSnapshotAdapter`
+3. **嵌套对象序列化失败**：`RebalanceSnapshot.funds` 字段类型为 `List<FundSnapshot>`，写入时需要序列化嵌套对象
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/services/hive_service.dart` | 移除 `hide FundSnapshot, FundSnapshotAdapter` |
+| `lib/services/hive_service.dart` | 添加 `Hive.registerAdapter(FundSnapshotAdapter());` |
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors
+```
+
+### Git 提交
+
+```
+[待提交]
+```
+
+### 方案文档
+
+`docs/plans/fix-fundsnapshot-adapter-missing.md`
