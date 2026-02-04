@@ -25,6 +25,11 @@ class _FundListScreenState extends State<FundListScreen> {
       if (!_isEditMode) {
         _selectedFundIds.clear();
         _isAllSelected = false;
+      } else {
+        final provider = Provider.of<PortfolioProvider>(context, listen: false);
+        final funds = provider.getAllFunds();
+        _isAllSelected = _selectedFundIds.isNotEmpty &&
+            _selectedFundIds.length == funds.length;
       }
     });
   }

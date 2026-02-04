@@ -721,3 +721,27 @@ flutter analyze: ✅ 0 errors (4 个 info 警告)
 ### 方案文档
 
 `docs/plans/remove-main-screen-duplicate-titles-20260204.md`
+
+---
+
+## M27：修复基金列表编辑模式全选状态不同步 2026-02-04
+
+### 问题描述
+
+撤销删除后再次进入编辑模式，全选按钮仍显示"取消全选"状态。
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/screens/fund_list_screen.dart` | 更新 `_toggleEditMode` 方法，进入编辑模式时重新计算全选状态 |
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (4 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/fix-fund-list-edit-mode-state-20260204.md`
