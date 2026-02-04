@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:investment_app/models/fund.dart';
 import 'package:investment_app/models/fund_deletion_history.dart';
 import 'package:investment_app/models/portfolio.dart';
+import 'package:investment_app/models/rebalance_check_result.dart';
 import 'package:investment_app/models/rebalance_snapshot.dart';
+import 'package:investment_app/models/target_allocation.dart';
 import 'package:investment_app/services/hive_service.dart';
 import 'package:investment_app/services/portfolio_calculator.dart';
 import 'package:investment_app/services/rebalance_calculator.dart';
@@ -134,6 +136,33 @@ class PortfolioProvider with ChangeNotifier {
 
   List<RebalanceAction> getRebalanceActions() {
     return _rebalanceCalculator?.generateRebalanceActions() ?? [];
+  }
+
+  RebalanceCheckResult? checkCanRebalance() {
+    if (_portfolio == null || _portfolio!.funds.isEmpty) {
+      return const RebalanceCheckResult(
+        canRebalance: false,
+        reason: RebalanceCheckReason.emptyCategoryNeedsBuy,
+      );
+    }
+
+    for (final category in PortfolioCategory.values) {
+      final currentAmount = _portfolio!.getAmountByCategory(category);
+      final targetAmount = totalAmount * TargetAllocation.getTarget(category);
+
+      if (currentAmount == 0 && targetAmount > 0) {
+        return RebalanceCheckResult(
+          canRebalance: false,
+          reason: RebalanceCheckReason.emptyCategoryNeedsBuy,
+          category: category,
+        );
+      }
+    }
+
+    return const RebalanceCheckResult(
+      canRebalance: true,
+      reason: RebalanceCheckReason.canRebalance,
+    );
   }
 
   List<PortfolioCategory> getWarningCategories() {

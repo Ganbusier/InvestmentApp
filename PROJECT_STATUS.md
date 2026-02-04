@@ -907,3 +907,48 @@ flutter analyze: ✅ 0 errors (4 个 info 警告)
 ### 方案文档
 
 `docs/plans/fix-home-category-card-percentage-display-20260204.md`
+
+---
+
+## M32：添加空类别无法执行再平衡的检查 2026-02-04
+
+### 问题描述
+
+当四个类别中有类别空缺时（比如只添加了一只股票基金，其它三个类别为空），执行再平衡操作会出现问题：
+- 再平衡只调整现有基金的金额
+- 空类别中没有基金可以接收资金转移
+- 导致资金丢失
+
+### 解决方案
+
+方案A：不执行再平衡，向用户显示原因和解决方案
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/models/rebalance_check_result.dart` | 新建检查结果类 |
+| `lib/providers/portfolio_provider.dart` | 添加 `checkCanRebalance()` 方法 |
+| `lib/screens/home_screen.dart` | 显示不可执行状态和原因 |
+| `lib/screens/rebalance_screen.dart` | 预览前检查，显示原因对话框和"去添加基金"按钮 |
+
+### 预期效果
+
+**首页再平衡卡片（空类别时）：**
+- 显示警告图标和原因文字
+- 点击跳转到再平衡页面
+
+**再平衡页面（空类别时）：**
+- 显示"无法执行再平衡"状态
+- 显示原因和"去添加基金"按钮
+- 点击跳转到首页添加基金
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (5 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/add-rebalance-empty-category-check-20260204.md`
