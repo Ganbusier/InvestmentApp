@@ -13,7 +13,7 @@ class PortfolioCalculator {
 
     if (total == 0) {
       for (final category in PortfolioCategory.values) {
-        percentages[category] = 0;
+        percentages[category] = 0.25;
       }
       return percentages;
     }
@@ -28,14 +28,6 @@ class PortfolioCalculator {
   Map<PortfolioCategory, double> calculateDeviations() {
     final percentages = calculateCategoryPercentages();
     final deviations = <PortfolioCategory, double>{};
-    final total = portfolio.totalAmount;
-
-    if (total == 0) {
-      for (final category in PortfolioCategory.values) {
-        deviations[category] = 0;
-      }
-      return deviations;
-    }
 
     for (final category in PortfolioCategory.values) {
       final target = TargetAllocation.getTarget(category);
@@ -46,10 +38,6 @@ class PortfolioCalculator {
   }
 
   Map<PortfolioCategory, bool> getCategoriesWithWarning() {
-    if (portfolio.totalAmount == 0) {
-      return {};
-    }
-
     final percentages = calculateCategoryPercentages();
     final warnings = <PortfolioCategory, bool>{};
 

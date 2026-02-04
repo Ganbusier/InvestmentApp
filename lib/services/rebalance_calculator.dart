@@ -53,10 +53,6 @@ class RebalanceCalculator {
   }
 
   bool get needsRebalancing {
-    if (totalAmount == 0) {
-      return false;
-    }
-
     final deviations = PortfolioCalculator(portfolio: portfolio).calculateDeviations();
     return deviations.values.any((dev) => dev.abs() > 0.05);
   }

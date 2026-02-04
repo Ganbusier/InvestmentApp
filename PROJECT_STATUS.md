@@ -834,3 +834,48 @@ flutter analyze: ✅ 0 errors (4 个 info 警告)
 ### 方案文档
 
 `docs/plans/fix-zero-total-amount-warning-state-20260204.md`
+
+---
+
+## M30：修复总金额为0时百分比显示为0%的问题 2026-02-04
+
+### 问题描述
+
+当总投资金额（totalAmount）为0时：
+- 各类别当前百分比显示 0%
+- 应该显示 25%（与目标比例一致）
+
+### 问题根源
+
+`calculateCategoryPercentages()` 方法在 total == 0 时返回 0
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/services/portfolio_calculator.dart` | `calculateCategoryPercentages()` 在 total == 0 时返回 0.25 |
+| `lib/services/portfolio_calculator.dart` | `calculateDeviations()` 恢复原有逻辑 |
+| `lib/services/portfolio_calculator.dart` | `getCategoriesWithWarning()` 恢复原有逻辑 |
+| `lib/services/rebalance_calculator.dart` | `needsRebalancing()` 恢复原有逻辑 |
+| `lib/screens/statistics_screen.dart` | `percentage == 0` 恢复为 `deviation == 0` |
+| `lib/screens/rebalance_screen.dart` | `percentage == 0` 恢复为 `deviation == 0` |
+| `lib/widgets/category_card.dart` | `currentPercentage == 0` 恢复为 `deviation == 0` |
+
+### 预期效果
+
+| 页面 | 空状态显示 |
+|------|-----------|
+| 首页类别卡片 | 25%，偏离"平衡" |
+| 统计页面类别详情 | 25%，偏离"平衡" |
+| 再平衡当前配置 | 25%，偏离"平衡" |
+| 首页警告 | 不显示 |
+
+### 验证结果
+
+```
+flutter analyze: ✅ 0 errors (4 个 info 警告)
+```
+
+### 方案文档
+
+`docs/plans/fix-zero-total-amount-percentage-display-20260204.md`

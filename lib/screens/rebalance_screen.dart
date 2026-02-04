@@ -890,7 +890,7 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                 : deviation < 0
                     ? color
                     : AppTheme.success;
-            final deviationText = percentage == 0
+            final deviationText = deviation == 0
                 ? '平衡'
                 : deviation >= 0
                     ? '+${(deviation * 100).toStringAsFixed(1)}%'
