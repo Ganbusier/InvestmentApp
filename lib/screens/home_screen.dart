@@ -541,24 +541,6 @@ class _HomeScreenState extends State<HomeScreen> {
           funds: provider.getFundsByCategory(category),
           onDeleteFund: (fund) async {
             await provider.deleteFund(fund.id);
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                      const SizedBox(width: 10),
-                      Text('已删除 ${fund.name}'),
-                    ],
-                  ),
-                  backgroundColor: AppTheme.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              );
-            }
           },
           onAddFund: (category) {
             _showAddFundDialogWithCategory(category);

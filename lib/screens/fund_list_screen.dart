@@ -128,13 +128,11 @@ class _FundListScreenState extends State<FundListScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.pop(context);
-                        final deletedCount = _selectedFundIds.length;
                         await provider.deleteFunds(_selectedFundIds.toList());
                         setState(() {
                           _selectedFundIds.clear();
                           _isEditMode = false;
                         });
-                        _showUndoSnackBar(context, provider, deletedCount);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.deleteColor,
@@ -153,36 +151,32 @@ class _FundListScreenState extends State<FundListScreen> {
     );
   }
 
-  void _showUndoSnackBar(
-      BuildContext context, PortfolioProvider provider, int count) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 10),
-            Text('已删除 $count 只基金'),
-          ],
-        ),
-        action: SnackBarAction(
-          label: '撤销',
-          textColor: AppTheme.accentGold,
-          onPressed: () async {
-            await provider.undoLastDeletion();
-          },
-        ),
-        backgroundColor: AppTheme.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
   void _showUndoHistoryDialog(
       BuildContext context, PortfolioProvider provider) {
+    if (provider.deletionHistory.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('删除历史记录'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.inbox, size: 64, color: Colors.grey[400]),
+              const SizedBox(height: 16),
+              const Text('暂无删除记录', style: TextStyle(color: Colors.grey)),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('确定'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -329,19 +323,19 @@ class _FundListScreenState extends State<FundListScreen> {
           ),
         ),
         actions: [
-          if (!_isEditMode && context.watch<PortfolioProvider>().canUndo)
+          if (!_isEditMode)
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: IconButton(
                 icon: Container(
                   padding: const EdgeInsets.all(6),
-                  child: const Icon(Icons.restore, color: AppTheme.accentGold),
+                  child: const Icon(Icons.history, color: AppTheme.accentGold),
                 ),
                 onPressed: () => _showUndoHistoryDialog(
                   context,
                   Provider.of<PortfolioProvider>(context, listen: false),
                 ),
-                tooltip: '撤销删除',
+                tooltip: '删除历史记录',
               ),
             ),
           if (_isEditMode)
@@ -992,7 +986,6 @@ class _FundListScreenState extends State<FundListScreen> {
                       onPressed: () async {
                         Navigator.pop(context);
                         await provider.deleteFund(fund.id);
-                        _showUndoSnackBar(context, provider, 1);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.deleteColor,
