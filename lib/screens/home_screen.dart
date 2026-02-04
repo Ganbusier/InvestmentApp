@@ -301,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildSummaryCard(context, provider),
-                if (provider.hasWarnings)
+                if (provider.hasWarningsConsideringThreshold)
                   WarningBanner(
                     message: '部分投资类别偏离目标配置，请关注',
                     onAction: () => _showRebalanceSheet(context),

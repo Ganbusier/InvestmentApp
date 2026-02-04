@@ -33,6 +33,10 @@ class PortfolioProvider with ChangeNotifier {
 
   bool get isLoaded => _portfolio != null;
   bool get hasWarnings => _calculator?.hasAnyWarning ?? false;
+  bool get hasWarningsConsideringThreshold {
+    if (_rebalanceCalculator == null) return false;
+    return _rebalanceCalculator!.needsRebalancing;
+  }
   bool get needsRebalancing => _rebalanceCalculator?.needsRebalancing ?? false;
   bool get canUndoRebalance => _rebalanceSnapshot != null;
   bool get canUndo => _deletionHistory.isNotEmpty;

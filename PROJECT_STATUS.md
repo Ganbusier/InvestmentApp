@@ -1105,6 +1105,41 @@ flutter analyze: ✅ 0 errors
 
 ---
 
+## M35：修复首页警告与再平衡阈值不一致问题 2026-02-04
+
+### 问题描述
+
+更新再平衡阈值后，即使所有类别的偏移值都在阈值之内，首页仍然会显示警告"部分投资类别偏离目标配置"。
+
+### 问题根源
+
+首页警告与再平衡判断使用了**不同的阈值标准**：
+
+| 功能 | 判断逻辑 | 阈值来源 |
+|-----|---------|---------|
+| 首页警告 `hasWarnings` | `TargetAllocation.isExcessive/Deficient()` | **固定阈值 ±20%** |
+| 再平衡 `needsRebalancing` | `deviation.abs() > threshold` | **用户自定义阈值** |
+
+### 修复内容
+
+| 文件 | 修改 |
+|------|------|
+| `lib/providers/portfolio_provider.dart` | 添加 `hasWarningsConsideringThreshold` getter |
+| `lib/screens/home_screen.dart` | 使用 `hasWarningsConsideringThreshold` 替换 `hasWarnings` |
+
+### 验证结果
+
+```
+flutter test: ✅ 8 passed
+flutter analyze: ✅ 0 errors
+```
+
+### 方案文档
+
+`docs/plans/fix-warning-threshold-consistency.md`
+
+---
+
 ## 当前项目状态
 
 | 阶段 | 状态 | 说明 |
@@ -1116,6 +1151,7 @@ flutter analyze: ✅ 0 errors
 | M32 | ✅ 已完成 | 空类别检查 |
 | M33 | ✅ 已完成 | 再平衡阈值功能修复 |
 | M34 | ✅ 已完成 | 阈值设置交互优化 |
+| M35 | ✅ 已完成 | 警告与阈值一致性修复 |
 
 ### 技术状态
 
@@ -1123,7 +1159,7 @@ flutter analyze: ✅ 0 errors
 |------|------|
 | flutter analyze | ✅ 0 errors |
 | flutter test | ✅ 8 passed |
-| Git status | ✅ 已推送到远程 |
+| Git status | ✅ 待提交 |
 
 ### 核心功能状态
 
@@ -1131,7 +1167,7 @@ flutter analyze: ✅ 0 errors
 |------|------|------|
 | 基金录入 | ✅ 完整 | 添加、编辑、删除 |
 | 统计可视化 | ✅ 完整 | 饼图、类别分布 |
-| 监控提醒 | ✅ 完整 | 偏离预警 |
+| 监控提醒 | ✅ 完整 | 偏离预警（与阈值一致） |
 | 再平衡功能 | ✅ 完整 | 预览、执行、撤销 |
 | 删除撤销 | ✅ 完整 | 最多 10 条历史，多次撤销 |
 | 首页基金编辑 | ✅ 完整 | 展开后点击编辑 |
