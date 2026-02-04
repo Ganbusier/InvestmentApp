@@ -3,11 +3,12 @@ import 'package:intl/intl.dart';
 class Formatters {
   static final NumberFormat currencyFormat = NumberFormat.currency(
     locale: 'zh_CN',
-    symbol: '¥',
+    symbol: '¥ ',
     decimalDigits: 2,
   );
 
-  static final NumberFormat percentFormat = NumberFormat.percentPattern('zh_CN');
+  static final NumberFormat percentFormat =
+      NumberFormat.percentPattern('zh_CN');
 
   static String formatCurrency(double amount) {
     return currencyFormat.format(amount);

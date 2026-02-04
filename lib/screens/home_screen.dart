@@ -185,6 +185,64 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showEditFundDialog(BuildContext context, PortfolioProvider provider, Fund fund) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppTheme.cardBackground,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          width: 450,
+          padding: const EdgeInsets.all(24),
+          decoration: AppTheme.getCardDecoration(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.primary.withValues(alpha: 0.2),
+                          AppTheme.primary.withValues(alpha: 0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.edit, color: AppTheme.primary),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    '编辑基金',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: AddFundForm(
+                    existingFund: fund,
+                    onSaved: (updatedFund) {
+                      provider.updateFund(updatedFund);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -542,6 +600,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onDeleteFund: (fund) async {
             await provider.deleteFund(fund.id);
           },
+          onFundTap: (fund) => _showEditFundDialog(context, provider, fund),
           onAddFund: (category) {
             _showAddFundDialogWithCategory(category);
           },

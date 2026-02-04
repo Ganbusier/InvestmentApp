@@ -11,6 +11,7 @@ class CategoryCard extends StatefulWidget {
   final double targetPercentage;
   final List<Fund> funds;
   final Function(Fund fund)? onDeleteFund;
+  final Function(Fund fund)? onFundTap;
   final Function(PortfolioCategory category)? onAddFund;
 
   const CategoryCard({
@@ -22,6 +23,7 @@ class CategoryCard extends StatefulWidget {
     required this.targetPercentage,
     required this.funds,
     this.onDeleteFund,
+    this.onFundTap,
     this.onAddFund,
   });
 
@@ -398,23 +400,28 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
   Widget _buildFundItem(BuildContext context, Fund fund) {
     final color = AppTheme.getCategoryColor(widget.category);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.surface.withValues(alpha: 0.5),
-            AppTheme.surface.withValues(alpha: 0.3),
-          ],
-        ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => widget.onFundTap?.call(fund),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
-          width: 1,
-        ),
-      ),
-      child: Row(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.surface.withValues(alpha: 0.5),
+                AppTheme.surface.withValues(alpha: 0.3),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.05),
+              width: 1,
+            ),
+          ),
+          child: Row(
         children: [
           Container(
             width: 6,
@@ -458,7 +465,7 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
             ),
           ),
            const SizedBox(width: 12),
-          InkWell(
+            InkWell(
             onTap: () => _confirmDelete(context, fund),
             borderRadius: BorderRadius.circular(10),
             splashColor: Colors.transparent,
@@ -481,6 +488,8 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }

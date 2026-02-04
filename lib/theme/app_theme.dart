@@ -17,7 +17,7 @@ class AppTheme {
   static const Color accentGoldLight = Color(0xFFF4E5B2);
   static const Color accentPurple = Color(0xFF8B5CF6);
 
-  static const Color stockColor = Color(0xFF26A69A);
+  static const Color stockColor = Color.fromARGB(255, 176, 53, 53);
   static const Color bondColor = Color(0xFF3B82F6);
   static const Color cashColor = Color(0xFF14B8A6);
   static const Color goldColor = Color(0xFFF59E0B);
