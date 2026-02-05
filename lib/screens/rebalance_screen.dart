@@ -810,7 +810,12 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
     final canRebalance = checkResult?.canExecute ?? true;
 
     if (needsRebalancing && !canRebalance) {
-      return CannotRebalanceCard(checkResult: checkResult!, provider: provider);
+      return CannotRebalanceCard(
+        checkResult: checkResult!,
+        provider: provider,
+        onBack: null,
+        onAddFund: null,
+      );
     }
 
     return Container(
