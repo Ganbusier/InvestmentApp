@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PortfolioProvider()),
       ],
       child: MaterialApp(
-        title: '理财App',
+        title: '永久投资组合模拟器',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         home: const MainScreen(),
