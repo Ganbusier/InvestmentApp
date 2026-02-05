@@ -1178,4 +1178,5 @@ flutter analyze: ✅ 0 errors
 
 ## 已修复 Bug
 
+- [2026-02-05] WarningBanner 交互优化，移除查看详情按钮
 - [2026-02-05] CategoryCard RenderFlex 溢出问题
