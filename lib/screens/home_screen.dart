@@ -844,7 +844,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 24),
             if (checkResult != null && !checkResult.canRebalance)
-              CannotRebalanceCard(checkResult: checkResult, provider: provider)
+              CannotRebalanceCard(
+                checkResult: checkResult,
+                provider: provider,
+                onBack: () => Navigator.of(context).pop(),
+                onAddFund: () => Navigator.of(context).pop(),
+              )
             else
               _buildRebalanceActionsList(provider),
           ],
