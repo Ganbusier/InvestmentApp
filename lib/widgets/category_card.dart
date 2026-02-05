@@ -31,7 +31,8 @@ class CategoryCard extends StatefulWidget {
   State<CategoryCard> createState() => _CategoryCardState();
 }
 
-class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderStateMixin {
+class _CategoryCardState extends State<CategoryCard>
+    with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
   late AnimationController _animationController;
   late Animation<double> _rotateAnimation;
@@ -97,7 +98,8 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                   color: AppTheme.deleteColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: const Icon(Icons.delete_forever, color: AppTheme.deleteColor, size: 40),
+                child: const Icon(Icons.delete_forever,
+                    color: AppTheme.deleteColor, size: 40),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -124,11 +126,13 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                        side: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.2)),
                       ),
                       child: Text(
                         '取消',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7)),
                       ),
                     ),
                   ),
@@ -165,7 +169,11 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
         : deviation >= 0
             ? '+${(deviation * 100).toStringAsFixed(1)}%'
             : '${(deviation * 100).toStringAsFixed(1)}%';
-    final deviationColor = deviation > 0 ? AppTheme.error : deviation < 0 ? color.withValues(alpha: 0.8) : AppTheme.success;
+    final deviationColor = deviation > 0
+        ? AppTheme.error
+        : deviation < 0
+            ? color.withValues(alpha: 0.8)
+            : AppTheme.success;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -176,7 +184,8 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
             color: Colors.transparent,
             child: InkWell(
               onTap: _toggleExpanded,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -213,17 +222,22 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                             children: [
                               Row(
                                 children: [
-                                  Text(
-                                    widget.category.displayName,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                                  Flexible(
+                                    child: Text(
+                                      widget.category.displayName,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: color.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(8),
@@ -235,6 +249,8 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                                         color: color,
                                         fontWeight: FontWeight.w600,
                                       ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
                                     ),
                                   ),
                                 ],
@@ -251,7 +267,8 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
@@ -284,10 +301,12 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: AppTheme.accentGold.withValues(alpha: 0.15),
+                                color:
+                                    AppTheme.accentGold.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: AppTheme.accentGold.withValues(alpha: 0.3),
+                                  color: AppTheme.accentGold
+                                      .withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -321,7 +340,10 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                         ),
                         Container(
                           height: 12,
-                          width: (MediaQuery.of(context).size.width * widget.currentPercentage.clamp(0.0, 1.0) - 80).clamp(0.0, double.infinity),
+                          width: (MediaQuery.of(context).size.width *
+                                      widget.currentPercentage.clamp(0.0, 1.0) -
+                                  80)
+                              .clamp(0.0, double.infinity),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
@@ -345,9 +367,12 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildInfoItem('当前金额', Formatters.formatCurrency(widget.currentAmount)),
-                        _buildInfoItem('目标金额', Formatters.formatCurrency(widget.targetAmount)),
-                        _buildInfoItem('偏离', deviationText, textColor: deviationColor),
+                        _buildInfoItem('当前金额',
+                            Formatters.formatCurrency(widget.currentAmount)),
+                        _buildInfoItem('目标金额',
+                            Formatters.formatCurrency(widget.targetAmount)),
+                        _buildInfoItem('偏离', deviationText,
+                            textColor: deviationColor),
                       ],
                     ),
                   ],
@@ -366,10 +391,13 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                     Colors.transparent,
                   ],
                 ),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(20)),
               ),
               child: Column(
-                children: widget.funds.map((fund) => _buildFundItem(context, fund)).toList(),
+                children: widget.funds
+                    .map((fund) => _buildFundItem(context, fund))
+                    .toList(),
               ),
             ),
         ],
@@ -426,73 +454,73 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
             ),
           ),
           child: Row(
-        children: [
-          Container(
-            width: 6,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [color, color.withValues(alpha: 0.6)],
+            children: [
+              Container(
+                width: 6,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [color, color.withValues(alpha: 0.6)],
+                  ),
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
-              borderRadius: BorderRadius.circular(3),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  fund.name,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fund.name,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      fund.code,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  fund.code,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.5),
-                  ),
+              ),
+              Text(
+                Formatters.formatCurrency(fund.amount),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
-              ],
-            ),
-          ),
-          Text(
-            Formatters.formatCurrency(fund.amount),
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-           const SizedBox(width: 12),
-            InkWell(
-            onTap: () => _confirmDelete(context, fund),
-            borderRadius: BorderRadius.circular(10),
-            splashColor: Colors.transparent,
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: AppTheme.deleteColor.withValues(alpha: 0.1),
+              ),
+              const SizedBox(width: 12),
+              InkWell(
+                onTap: () => _confirmDelete(context, fund),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: AppTheme.deleteColor.withValues(alpha: 0.2),
-                  width: 1,
+                splashColor: Colors.transparent,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.deleteColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppTheme.deleteColor.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.delete_outline,
+                    color: AppTheme.deleteColor,
+                    size: 18,
+                  ),
                 ),
               ),
-              child: const Icon(
-                Icons.delete_outline,
-                color: AppTheme.deleteColor,
-                size: 18,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
         ),
       ),
     );
