@@ -1173,3 +1173,9 @@ flutter analyze: ✅ 0 errors
 | 首页基金编辑 | ✅ 完整 | 展开后点击编辑 |
 | 阈值设置 | ✅ 完整 | ModalBottomSheet 交互优化 |
 | 项目规则 | ✅ 已建立 | superpowers 规范、方案保存、状态记录 |
+
+---
+
+## 已修复 Bug
+
+- [2026-02-05] CategoryCard RenderFlex 溢出问题
