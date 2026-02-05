@@ -89,7 +89,8 @@ class CannotRebalanceCard extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     provider.triggerShowAddFundDialog();
-                    provider.selectTab(0);
+                    Navigator.of(context).pop(); // 先关闭弹窗
+                    provider.selectTab(0); // 再切换 Tab
                   },
                   borderRadius: BorderRadius.circular(14),
                   child: Container(
