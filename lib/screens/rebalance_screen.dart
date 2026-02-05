@@ -968,7 +968,6 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                 child: OutlinedButton(
                   onPressed: () {
                     provider.selectTab(0);
-                    Navigator.pop(context);
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
