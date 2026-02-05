@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/models/rebalance_check_result.dart';
 import 'package:investment_app/providers/portfolio_provider.dart';
 import 'package:investment_app/theme/app_theme.dart';
 import 'package:investment_app/utils/formatters.dart';
+import 'package:investment_app/widgets/cannot_rebalance_card.dart';
 import 'package:provider/provider.dart';
 
 class RebalanceScreen extends StatefulWidget {
@@ -121,7 +121,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.white.withValues(alpha: 0.4)),
+            Icon(Icons.chevron_right,
+                color: Colors.white.withValues(alpha: 0.4)),
           ],
         ),
       ),
@@ -809,7 +810,7 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
     final canRebalance = checkResult?.canExecute ?? true;
 
     if (needsRebalancing && !canRebalance) {
-      return _buildCannotRebalanceCard(checkResult!, provider, context);
+      return CannotRebalanceCard(checkResult: checkResult!, provider: provider);
     }
 
     return Container(
@@ -906,118 +907,6 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
               ),
             ),
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCannotRebalanceCard(RebalanceCheckResult checkResult,
-      PortfolioProvider provider, BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.warning.withValues(alpha: 0.15),
-            AppTheme.warning.withValues(alpha: 0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTheme.warning.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.warning.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            child: const Icon(
-              Icons.warning_amber,
-              color: AppTheme.warning,
-              size: 40,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            '无法执行再平衡',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.warning,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            checkResult.message,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.8),
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side:
-                        BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    '返回',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    provider.triggerShowAddFundDialog();
-                    provider.selectTab(0);
-                  },
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppTheme.accentGold, Color(0xFFE8C560)],
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add, color: AppTheme.primaryDark),
-                        SizedBox(width: 8),
-                        Text(
-                          '去添加基金',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.primaryDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -1329,7 +1218,8 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
     );
   }
 
-  void _showThresholdBottomSheet(BuildContext context, PortfolioProvider provider) {
+  void _showThresholdBottomSheet(
+      BuildContext context, PortfolioProvider provider) {
     final controller = TextEditingController(
       text: (provider.rebalanceThreshold * 100).toStringAsFixed(2),
     );
@@ -1465,22 +1355,27 @@ class _ThresholdEditSheetState extends State<_ThresholdEditSheet> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white, fontSize: 24),
             decoration: InputDecoration(
-              suffix: const Text('%', style: TextStyle(color: Colors.white70, fontSize: 18)),
+              suffix: const Text('%',
+                  style: TextStyle(color: Colors.white70, fontSize: 18)),
               filled: true,
               fillColor: Colors.white.withValues(alpha: 0.05),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: _errorText != null ? AppTheme.error : Colors.white.withValues(alpha: 0.2),
+                  color: _errorText != null
+                      ? AppTheme.error
+                      : Colors.white.withValues(alpha: 0.2),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: _errorText != null ? AppTheme.error : AppTheme.accentGold,
+                  color:
+                      _errorText != null ? AppTheme.error : AppTheme.accentGold,
                 ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
             onChanged: _validateInput,
           ),
@@ -1488,7 +1383,8 @@ class _ThresholdEditSheetState extends State<_ThresholdEditSheet> {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.error_outline, color: AppTheme.error, size: 16),
+                const Icon(Icons.error_outline,
+                    color: AppTheme.error, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   _errorText!,
@@ -1518,11 +1414,17 @@ class _ThresholdEditSheetState extends State<_ThresholdEditSheet> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _isValid ? () => widget.onConfirm(double.parse(widget.controller.text)) : null,
+              onPressed: _isValid
+                  ? () => widget.onConfirm(double.parse(widget.controller.text))
+                  : null,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: _isValid ? AppTheme.accentGold : Colors.white.withValues(alpha: 0.1),
-                foregroundColor: _isValid ? AppTheme.primaryDark : Colors.white.withValues(alpha: 0.3),
+                backgroundColor: _isValid
+                    ? AppTheme.accentGold
+                    : Colors.white.withValues(alpha: 0.1),
+                foregroundColor: _isValid
+                    ? AppTheme.primaryDark
+                    : Colors.white.withValues(alpha: 0.3),
               ),
               child: const Text(
                 '确认',
