@@ -45,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.add_circle, color: AppTheme.accentGold),
+                    child: const Icon(Icons.add_circle,
+                        color: AppTheme.accentGold),
                   ),
                   const SizedBox(width: 12),
                   const Text(
@@ -69,7 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         SnackBar(
                           content: Row(
                             children: [
-                              const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                              const Icon(Icons.check_circle,
+                                  color: Colors.white, size: 20),
                               const SizedBox(width: 10),
                               Text('已添加 ${fund.name}'),
                             ],
@@ -162,7 +164,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         SnackBar(
                           content: Row(
                             children: [
-                              const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                              const Icon(Icons.check_circle,
+                                  color: Colors.white, size: 20),
                               const SizedBox(width: 10),
                               Text('已添加 ${fund.name}'),
                             ],
@@ -185,7 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showEditFundDialog(BuildContext context, PortfolioProvider provider, Fund fund) {
+  void _showEditFundDialog(
+      BuildContext context, PortfolioProvider provider, Fund fund) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -255,11 +259,15 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppTheme.accentGold, AppTheme.accentGold.withValues(alpha: 0.8)],
+                  colors: [
+                    AppTheme.accentGold,
+                    AppTheme.accentGold.withValues(alpha: 0.8)
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.trending_up, color: AppTheme.primaryDark, size: 20),
+              child: const Icon(Icons.trending_up,
+                  color: AppTheme.primaryDark, size: 20),
             ),
             const SizedBox(width: 12),
             const Text(
@@ -304,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (provider.hasWarningsConsideringThreshold)
                   WarningBanner(
                     message: '部分投资类别偏离目标配置，请关注',
-                    onAction: () => _showRebalanceSheet(context),
+                    onTap: () => _showRebalanceSheet(context),
                   ),
                 _buildChartSection(provider),
                 _buildCategoriesSection(context, provider),
@@ -329,7 +337,8 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -346,7 +355,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.account_balance_wallet, color: AppTheme.accentGold, size: 16),
+                      Icon(Icons.account_balance_wallet,
+                          color: AppTheme.accentGold, size: 16),
                       SizedBox(width: 6),
                       Text(
                         '总投资金额',
@@ -407,10 +417,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                       child: const Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add_circle, color: AppTheme.primaryDark, size: 22),
+                          Icon(Icons.add_circle,
+                              color: AppTheme.primaryDark, size: 22),
                           SizedBox(width: 8),
                           Text(
                             '添加基金',
@@ -430,7 +441,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: InkWell(
                     onTap: provider.needsRebalancing
                         ? () {
-                            final provider = Provider.of<PortfolioProvider>(context, listen: false);
+                            final provider = Provider.of<PortfolioProvider>(
+                                context,
+                                listen: false);
                             provider.selectTab(3);
                           }
                         : null,
@@ -448,7 +461,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: AppTheme.accentGold.withValues(alpha: 0.5),
+                                color:
+                                    AppTheme.accentGold.withValues(alpha: 0.5),
                                 width: 1.5,
                               ),
                             )
@@ -584,7 +598,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
                 if (hasData)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppTheme.accentGold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
@@ -674,9 +689,12 @@ class _HomeScreenState extends State<HomeScreen> {
       categoryCards.add(
         CategoryCard(
           category: category,
-          currentAmount: provider.portfolio?.getAmountByCategory(category) ?? 0.0,
-          targetAmount: (provider.portfolio?.totalAmount ?? 0.0) * TargetAllocation.getTarget(category),
-          currentPercentage: provider.portfolio?.getPercentageByCategory(category) ?? 0.0,
+          currentAmount:
+              provider.portfolio?.getAmountByCategory(category) ?? 0.0,
+          targetAmount: (provider.portfolio?.totalAmount ?? 0.0) *
+              TargetAllocation.getTarget(category),
+          currentPercentage:
+              provider.portfolio?.getPercentageByCategory(category) ?? 0.0,
           targetPercentage: TargetAllocation.getTarget(category),
           funds: provider.getFundsByCategory(category),
           onDeleteFund: (fund) async {
@@ -726,7 +744,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceLight.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(20),
@@ -799,7 +818,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.swap_horiz, color: AppTheme.accentGold, size: 26),
+                  child: const Icon(Icons.swap_horiz,
+                      color: AppTheme.accentGold, size: 26),
                 ),
                 const SizedBox(width: 16),
                 const Text(
@@ -847,7 +867,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: AppTheme.success.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      child: const Icon(Icons.check_circle, color: AppTheme.success, size: 48),
+                      child: const Icon(Icons.check_circle,
+                          color: AppTheme.success, size: 48),
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -912,8 +933,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              action.isBuy ? Icons.add_circle : Icons.remove_circle,
-                              color: action.isBuy ? AppTheme.success : AppTheme.error,
+                              action.isBuy
+                                  ? Icons.add_circle
+                                  : Icons.remove_circle,
+                              color: action.isBuy
+                                  ? AppTheme.success
+                                  : AppTheme.error,
                               size: 24,
                             ),
                           ),
@@ -942,7 +967,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
                               color: action.isBuy
                                   ? AppTheme.success.withValues(alpha: 0.2)
@@ -954,7 +980,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: action.isBuy ? AppTheme.success : AppTheme.error,
+                                color: action.isBuy
+                                    ? AppTheme.success
+                                    : AppTheme.error,
                               ),
                             ),
                           ),
@@ -972,7 +1000,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.2), width: 1),
+                      side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.2), width: 1),
                     ),
                     child: Text(
                       '关闭',
