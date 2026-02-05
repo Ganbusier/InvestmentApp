@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:investment_app/models/fund.dart';
+import 'package:permanent_portfolio/models/fund.dart';
 
 void main() {
   group('Fund Model Tests', () {

@@ -1,6 +1,6 @@
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/models/portfolio.dart';
-import 'package:investment_app/models/target_allocation.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/models/portfolio.dart';
+import 'package:permanent_portfolio/models/target_allocation.dart';
 
 class PortfolioCalculator {
   final Portfolio portfolio;

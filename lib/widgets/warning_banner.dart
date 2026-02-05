@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/theme/app_theme.dart';
+import 'package:permanent_portfolio/theme/app_theme.dart';
 
 class WarningBanner extends StatelessWidget {
   final String message;

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/models/portfolio.dart';
-import 'package:investment_app/services/portfolio_calculator.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/models/portfolio.dart';
+import 'package:permanent_portfolio/services/portfolio_calculator.dart';
 
 void main() {
   group('PortfolioCalculator Tests', () {

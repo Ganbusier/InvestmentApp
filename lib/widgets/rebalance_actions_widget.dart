@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/services/rebalance_calculator.dart';
+import 'package:permanent_portfolio/services/rebalance_calculator.dart';
 
 class RebalanceActionsWidget extends StatelessWidget {
   final List<RebalanceAction> actions;

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/providers/portfolio_provider.dart';
-import 'package:investment_app/services/hive_service.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/providers/portfolio_provider.dart';
+import 'package:permanent_portfolio/services/hive_service.dart';
 
 void main() {
   group('PortfolioProvider Tests', () {

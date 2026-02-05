@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:investment_app/models/fund.dart';
+import 'package:permanent_portfolio/models/fund.dart';
 
 part 'portfolio.g.dart';
 

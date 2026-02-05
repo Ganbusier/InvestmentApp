@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/models/fund.dart';
+import 'package:permanent_portfolio/models/fund.dart';
 
 class AppTheme {
   static const Color primary = Color(0xFFF59E0B);

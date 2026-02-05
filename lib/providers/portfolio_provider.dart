@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/models/fund_deletion_history.dart';
-import 'package:investment_app/models/portfolio.dart';
-import 'package:investment_app/models/rebalance_check_result.dart';
-import 'package:investment_app/models/rebalance_snapshot.dart';
-import 'package:investment_app/models/target_allocation.dart';
-import 'package:investment_app/services/hive_service.dart';
-import 'package:investment_app/services/portfolio_calculator.dart';
-import 'package:investment_app/services/rebalance_calculator.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/models/fund_deletion_history.dart';
+import 'package:permanent_portfolio/models/portfolio.dart';
+import 'package:permanent_portfolio/models/rebalance_check_result.dart';
+import 'package:permanent_portfolio/models/rebalance_snapshot.dart';
+import 'package:permanent_portfolio/models/target_allocation.dart';
+import 'package:permanent_portfolio/services/hive_service.dart';
+import 'package:permanent_portfolio/services/portfolio_calculator.dart';
+import 'package:permanent_portfolio/services/rebalance_calculator.dart';
 
 class PortfolioProvider with ChangeNotifier {
   Portfolio? _portfolio;

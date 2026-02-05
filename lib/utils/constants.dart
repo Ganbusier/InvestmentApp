@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/models/fund.dart';
+import 'package:permanent_portfolio/models/fund.dart';
 
 class AppConstants {
   static const double warningThreshold = 0.2;

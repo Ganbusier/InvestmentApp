@@ -1,4 +1,4 @@
-import 'package:investment_app/models/fund.dart';
+import 'package:permanent_portfolio/models/fund.dart';
 
 class RebalanceCheckResult {
   final bool canRebalance;

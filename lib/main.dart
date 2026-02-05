@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/providers/portfolio_provider.dart';
-import 'package:investment_app/screens/main_screen.dart';
-import 'package:investment_app/services/hive_service.dart';
-import 'package:investment_app/theme/app_theme.dart';
+import 'package:permanent_portfolio/providers/portfolio_provider.dart';
+import 'package:permanent_portfolio/screens/main_screen.dart';
+import 'package:permanent_portfolio/services/hive_service.dart';
+import 'package:permanent_portfolio/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

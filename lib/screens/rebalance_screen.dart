@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/providers/portfolio_provider.dart';
-import 'package:investment_app/theme/app_theme.dart';
-import 'package:investment_app/utils/formatters.dart';
-import 'package:investment_app/widgets/cannot_rebalance_card.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/providers/portfolio_provider.dart';
+import 'package:permanent_portfolio/theme/app_theme.dart';
+import 'package:permanent_portfolio/utils/formatters.dart';
+import 'package:permanent_portfolio/widgets/cannot_rebalance_card.dart';
 import 'package:provider/provider.dart';
 
 class RebalanceScreen extends StatefulWidget {

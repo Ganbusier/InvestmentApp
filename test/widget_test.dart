@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:investment_app/main.dart';
+import 'package:permanent_portfolio/main.dart';
 
 void main() {
   testWidgets('App renders without crashing', (WidgetTester tester) async {

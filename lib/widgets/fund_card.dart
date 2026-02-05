@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/theme/app_theme.dart';
-import 'package:investment_app/utils/formatters.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/theme/app_theme.dart';
+import 'package:permanent_portfolio/utils/formatters.dart';
 
 class FundCard extends StatelessWidget {
   final Fund fund;

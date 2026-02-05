@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/theme/app_theme.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/theme/app_theme.dart';
 
 class AddFundForm extends StatefulWidget {
   final Fund? existingFund;

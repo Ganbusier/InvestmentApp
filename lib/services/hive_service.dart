@@ -1,8 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:investment_app/models/fund.dart';
-import 'package:investment_app/models/fund_deletion_history.dart';
-import 'package:investment_app/models/portfolio.dart';
-import 'package:investment_app/models/rebalance_snapshot.dart';
+import 'package:permanent_portfolio/models/fund.dart';
+import 'package:permanent_portfolio/models/fund_deletion_history.dart';
+import 'package:permanent_portfolio/models/portfolio.dart';
+import 'package:permanent_portfolio/models/rebalance_snapshot.dart';
 
 class HiveService {
   static const String _fundsBoxName = 'funds';

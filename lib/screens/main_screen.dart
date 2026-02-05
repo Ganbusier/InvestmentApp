@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:investment_app/providers/portfolio_provider.dart';
-import 'package:investment_app/screens/fund_list_screen.dart';
-import 'package:investment_app/screens/home_screen.dart';
-import 'package:investment_app/screens/rebalance_screen.dart';
-import 'package:investment_app/screens/statistics_screen.dart';
-import 'package:investment_app/theme/app_theme.dart';
+import 'package:permanent_portfolio/providers/portfolio_provider.dart';
+import 'package:permanent_portfolio/screens/fund_list_screen.dart';
+import 'package:permanent_portfolio/screens/home_screen.dart';
+import 'package:permanent_portfolio/screens/rebalance_screen.dart';
+import 'package:permanent_portfolio/screens/statistics_screen.dart';
+import 'package:permanent_portfolio/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
