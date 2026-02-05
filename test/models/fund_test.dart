@@ -41,10 +41,10 @@ void main() {
     });
 
     test('PortfolioCategory should have correct display names', () {
-      expect(PortfolioCategory.stock.displayName, '股票/权益类');
-      expect(PortfolioCategory.bond.displayName, '长期债券');
-      expect(PortfolioCategory.cash.displayName, '现金/货币基金');
-      expect(PortfolioCategory.gold.displayName, '黄金/商品');
+      expect(PortfolioCategory.stock.displayName, '股票');
+      expect(PortfolioCategory.bond.displayName, '债券');
+      expect(PortfolioCategory.cash.displayName, '现金');
+      expect(PortfolioCategory.gold.displayName, '黄金');
     });
 
     test('PortfolioCategory should have 25% target percentage', () {
