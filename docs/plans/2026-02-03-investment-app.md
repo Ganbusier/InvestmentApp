@@ -1,8 +1,8 @@
-# 理财App（永久投资组合）实现计划
+# 永久投资组合模拟器（永久投资组合）实现计划
 
 > **For Claude：** REQUIRED SUB-SKILL: 使用 superpowers:executing-plans 按任务逐一实现此计划。
 
-**目标：** 开发一款基于永久投资组合策略的理财App，帮助用户管理基金投资、监控各类别百分比，并在比例失衡时提供再平衡指引。
+**目标：** 开发一款基于永久投资组合策略的永久投资组合模拟器，帮助用户管理基金投资、监控各类别百分比，并在比例失衡时提供再平衡指引。
 
 **架构：** 采用Flutter跨平台框架，使用Hive进行本地数据持久化，Provider进行状态管理，fl_chart实现数据可视化。遵循TDD开发流程，先写测试后实现代码，确保功能可靠且易于维护。应用采用模块化设计，将数据模型、业务逻辑、UI组件分离，便于后续扩展云端同步功能。
 
@@ -25,7 +25,7 @@
 
 ```yaml
 name: investment_app
-description: 永久投资组合理财App
+description: 永久投资组合永久投资组合模拟器
 
 publish_to: none
 
@@ -92,7 +92,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PortfolioProvider()),
       ],
       child: MaterialApp(
-        title: '理财App',
+        title: '永久投资组合模拟器',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         home: const HomeScreen(),
@@ -111,7 +111,7 @@ import 'package:investment_app/main.dart';
 void main() {
   testWidgets('App renders without crashing', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
-    expect(find.text('理财App'), findsOneWidget);
+    expect(find.text('永久投资组合模拟器'), findsOneWidget);
   });
 }
 ```
@@ -119,7 +119,7 @@ void main() {
 **步骤5：创建README.md项目说明**
 
 ```markdown
-# 理财App（永久投资组合）
+# 永久投资组合模拟器（永久投资组合）
 
 基于永久投资组合策略的理财管理应用，帮助用户：
 - 按类别管理基金投资（股票、债券、现金、黄金）
@@ -3097,7 +3097,7 @@ Expected: Build successful
 
 ```bash
 git add .
-git commit -m "feat: 完成理财App所有功能开发"
+git commit -m "feat: 完成永久投资组合模拟器所有功能开发"
 git tag v1.0.0
 ```
 
