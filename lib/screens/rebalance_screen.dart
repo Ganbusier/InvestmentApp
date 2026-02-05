@@ -813,7 +813,7 @@ class _RebalanceScreenState extends State<RebalanceScreen> {
       return CannotRebalanceCard(
         checkResult: checkResult!,
         provider: provider,
-        onBack: null,
+        onBack: () => Navigator.of(context).popUntil((route) => route.isFirst),
         onAddFund: null,
       );
     }
