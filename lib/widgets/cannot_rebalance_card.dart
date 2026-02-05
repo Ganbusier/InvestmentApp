@@ -6,11 +6,15 @@ import 'package:investment_app/theme/app_theme.dart';
 class CannotRebalanceCard extends StatelessWidget {
   final RebalanceCheckResult checkResult;
   final PortfolioProvider provider;
+  final VoidCallback? onBack;
+  final VoidCallback? onAddFund;
 
   const CannotRebalanceCard({
     super.key,
     required this.checkResult,
     required this.provider,
+    this.onBack,
+    this.onAddFund,
   });
 
   @override
@@ -69,7 +73,7 @@ class CannotRebalanceCard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: onBack ?? () {},
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     side:
@@ -89,8 +93,10 @@ class CannotRebalanceCard extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     provider.triggerShowAddFundDialog();
-                    Navigator.of(context).pop(); // 先关闭弹窗
-                    provider.selectTab(0); // 再切换 Tab
+                    if (onAddFund != null) {
+                      onAddFund!();
+                    }
+                    provider.selectTab(0);
                   },
                   borderRadius: BorderRadius.circular(14),
                   child: Container(
