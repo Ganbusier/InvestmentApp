@@ -1180,3 +1180,4 @@ flutter analyze: ✅ 0 errors
 
 - [2026-02-05] WarningBanner 交互优化，移除查看详情按钮
 - [2026-02-05] CategoryCard RenderFlex 溢出问题
+- [2026-02-05] 修复 WarningBanner 再平衡检查，空类别时正确显示无法执行提示
