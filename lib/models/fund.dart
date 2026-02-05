@@ -19,13 +19,13 @@ extension PortfolioCategoryExtension on PortfolioCategory {
   String get displayName {
     switch (this) {
       case PortfolioCategory.stock:
-        return '股票/权益类';
+        return '股票';
       case PortfolioCategory.bond:
-        return '长期债券';
+        return '债券';
       case PortfolioCategory.cash:
-        return '现金/货币基金';
+        return '现金';
       case PortfolioCategory.gold:
-        return '黄金/商品';
+        return '黄金';
     }
   }
 
