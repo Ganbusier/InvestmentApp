@@ -5,6 +5,7 @@ import 'package:investment_app/providers/portfolio_provider.dart';
 import 'package:investment_app/theme/app_theme.dart';
 import 'package:investment_app/utils/formatters.dart';
 import 'package:investment_app/widgets/add_fund_form.dart';
+import 'package:investment_app/widgets/cannot_rebalance_card.dart';
 import 'package:investment_app/widgets/category_card.dart';
 import 'package:investment_app/widgets/pie_chart_widget.dart';
 import 'package:investment_app/widgets/warning_banner.dart';
@@ -311,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildSummaryCard(context, provider),
                 if (provider.hasWarningsConsideringThreshold)
                   WarningBanner(
-                    message: '部分投资类别偏离目标配置，请关注',
+                    message: '部分投资类别偏离目标配置，点击查看详情',
                     onTap: () => _showRebalanceSheet(context),
                   ),
                 _buildChartSection(provider),
@@ -774,7 +775,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showRebalanceSheet(BuildContext context) {
     final provider = Provider.of<PortfolioProvider>(context, listen: false);
-    final actions = provider.getRebalanceActions();
+    final checkResult = provider.checkCanRebalance();
 
     showModalBottomSheet(
       context: context,
@@ -842,181 +843,136 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            if (actions.isEmpty)
+            if (checkResult != null && !checkResult.canRebalance)
+              CannotRebalanceCard(checkResult: checkResult, provider: provider)
+            else
+              _buildRebalanceActionsList(provider),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRebalanceActionsList(PortfolioProvider provider) {
+    final actions = provider.getRebalanceActions();
+    if (actions.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(40),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.success.withValues(alpha: 0.1),
+              Colors.transparent,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppTheme.success.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.success.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Icon(Icons.check_circle,
+                  color: AppTheme.success, size: 40),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '投资组合已平衡',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.success,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '各类别占比与目标配置一致，无需调整',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white.withValues(alpha: 0.6),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: actions.map((action) {
+        final isBuy = action.amount > 0;
+        final categoryColor = AppTheme.getCategoryColor(action.category);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                isBuy
+                    ? AppTheme.success.withValues(alpha: 0.15)
+                    : AppTheme.error.withValues(alpha: 0.15),
+                Colors.transparent,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: (isBuy ? AppTheme.success : AppTheme.error)
+                  .withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
               Container(
-                padding: const EdgeInsets.all(40),
-                width: double.infinity,
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppTheme.success.withValues(alpha: 0.15),
-                      AppTheme.success.withValues(alpha: 0.05),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppTheme.success.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
+                  color: (isBuy ? AppTheme.success : AppTheme.error)
+                      .withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: Icon(
+                  isBuy ? Icons.arrow_downward : Icons.arrow_upward,
+                  color: isBuy ? AppTheme.success : AppTheme.error,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppTheme.success.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Icon(Icons.check_circle,
-                          color: AppTheme.success, size: 48),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '投资组合已平衡',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.success,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     Text(
-                      '各类别比例接近目标，无需调整',
+                      action.description,
                       style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: categoryColor,
                       ),
                     ),
                   ],
                 ),
-              )
-            else
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: actions.length,
-                  itemBuilder: (context, index) {
-                    final action = actions[index];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: action.isBuy
-                              ? [
-                                  AppTheme.success.withValues(alpha: 0.15),
-                                  AppTheme.success.withValues(alpha: 0.05),
-                                ]
-                              : [
-                                  AppTheme.error.withValues(alpha: 0.15),
-                                  AppTheme.error.withValues(alpha: 0.05),
-                                ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: action.isBuy
-                              ? AppTheme.success.withValues(alpha: 0.3)
-                              : AppTheme.error.withValues(alpha: 0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: action.isBuy
-                                  ? AppTheme.success.withValues(alpha: 0.2)
-                                  : AppTheme.error.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              action.isBuy
-                                  ? Icons.add_circle
-                                  : Icons.remove_circle,
-                              color: action.isBuy
-                                  ? AppTheme.success
-                                  : AppTheme.error,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  action.description,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  action.isBuy ? '比例偏低，建议增加投资' : '比例偏高，建议适当减仓',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.white.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: action.isBuy
-                                  ? AppTheme.success.withValues(alpha: 0.2)
-                                  : AppTheme.error.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              action.isBuy ? '买入' : '卖出',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: action.isBuy
-                                    ? AppTheme.success
-                                    : AppTheme.error,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+              ),
+              Text(
+                '${isBuy ? '+' : '-'}${Formatters.formatCurrency(action.amount.abs())}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: isBuy ? AppTheme.success : AppTheme.error,
                 ),
               ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.2), width: 1),
-                    ),
-                    child: Text(
-                      '关闭',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }
