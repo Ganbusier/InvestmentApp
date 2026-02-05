@@ -271,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 12),
             const Text(
-              '财富管理',
+              '永久投资组合模拟器',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
